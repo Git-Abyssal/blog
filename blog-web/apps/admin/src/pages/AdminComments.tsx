@@ -30,7 +30,7 @@ interface PageResponse {
   size: number
 }
 
-const PAGE_SIZE = 20
+const PAGE_SIZE = 10
 
 const filters: Array<{ value: CommentFilter; label: string }> = [
   { value: 'pending', label: '待审核' },

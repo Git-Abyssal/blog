@@ -29,7 +29,7 @@ const pageResponse = (
     totalElements: content.length,
     totalPages,
     number,
-    size: 20,
+    size: 10,
   },
 })
 
@@ -55,7 +55,7 @@ describe('AdminComments', () => {
         totalElements: 1,
         totalPages: 1,
         number: 0,
-        size: 20,
+        size: 10,
       },
     })
     vi.mocked(axios.post).mockResolvedValue({ data: {} })
@@ -85,14 +85,14 @@ describe('AdminComments', () => {
     const activeFilter = screen.getByRole('button', { name: /待审核/ })
     expect(activeFilter.querySelector('[aria-hidden="true"]')).toHaveClass('bg-brand-blue')
     expect(axios.get).toHaveBeenCalledWith('/api/admin/comments', {
-      params: { page: 0, size: 20, status: 'pending' },
+      params: { page: 0, size: 10, status: 'pending' },
     })
 
     fireEvent.click(screen.getByRole('button', { name: /已公开/ }))
 
     await waitFor(() => {
       expect(axios.get).toHaveBeenCalledWith('/api/admin/comments', {
-        params: { page: 0, size: 20, status: 'approved' },
+        params: { page: 0, size: 10, status: 'approved' },
       })
     })
     expect(screen.queryByRole('button', { name: /全部/ })).not.toBeInTheDocument()
@@ -110,7 +110,7 @@ describe('AdminComments', () => {
     await waitFor(() => {
       expect(axios.get).toHaveBeenCalledTimes(2)
       expect(axios.get).toHaveBeenLastCalledWith('/api/admin/comments', {
-        params: { page: 0, size: 20, status: 'pending' },
+        params: { page: 0, size: 10, status: 'pending' },
       })
     })
   })
@@ -125,7 +125,7 @@ describe('AdminComments', () => {
     await waitFor(() => {
       expect(axios.get).toHaveBeenCalledTimes(2)
       expect(axios.get).toHaveBeenLastCalledWith('/api/admin/comments', {
-        params: { page: 0, size: 20, status: 'pending' },
+        params: { page: 0, size: 10, status: 'pending' },
       })
     })
   })
@@ -193,7 +193,7 @@ describe('AdminComments', () => {
           totalElements: 1,
           totalPages: 1,
           number: 0,
-          size: 20,
+          size: 10,
         },
       })
 
@@ -250,7 +250,7 @@ describe('AdminComments', () => {
     await waitFor(() => {
       expect(axios.get).toHaveBeenCalledTimes(3)
       expect(axios.get).toHaveBeenNthCalledWith(3, '/api/admin/comments', {
-        params: { page: 0, size: 20, status: 'approved' },
+        params: { page: 0, size: 10, status: 'approved' },
       })
     })
 
@@ -290,7 +290,7 @@ describe('AdminComments', () => {
     await waitFor(() => {
       expect(axios.delete).toHaveBeenCalledWith('/api/admin/comments/22')
       expect(axios.get).toHaveBeenNthCalledWith(4, '/api/admin/comments', {
-        params: { page: 0, size: 20, status: 'pending' },
+        params: { page: 0, size: 10, status: 'pending' },
       })
     })
     expect(await screen.findByText('等待审核的评论')).toBeInTheDocument()
