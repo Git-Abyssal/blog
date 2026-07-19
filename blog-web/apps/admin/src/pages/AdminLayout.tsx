@@ -10,10 +10,10 @@ const nav = [
 
 const AdminLayout: React.FC = () => {
   return (
-    <div className="admin-workspace min-h-[calc(100vh-7rem)] py-3 sm:py-4">
-      <div className="mx-auto flex max-w-[72rem] flex-col gap-3">
+    <div className="admin-workspace min-h-[calc(100vh-7rem)] pb-3 sm:pb-4">
+      <div className="mx-auto flex max-w-[72rem] flex-col">
         <nav
-          className="category-scroll flex gap-1.5 overflow-x-auto border-y border-slate-200/90 dark:border-slate-800"
+          className="category-scroll flex gap-1.5 overflow-x-auto border-b border-slate-200/90 py-1.5 sm:py-2 dark:border-slate-800"
           aria-label="管理导航"
         >
           {nav.map(({ to, label }) => (

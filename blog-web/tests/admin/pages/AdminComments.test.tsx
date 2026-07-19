@@ -73,7 +73,17 @@ describe('AdminComments', () => {
   it('loads pending comments and sends an explicit status for every filter', async () => {
     renderPage()
 
-    expect(await screen.findByText('等待审核的评论')).toBeInTheDocument()
+    const commentContent = await screen.findByText('等待审核的评论')
+    expect(commentContent).toBeInTheDocument()
+    const commentList = commentContent.closest('ul')
+    const pageHeading = screen.getByRole('heading', { name: '评论管理' })
+    expect(pageHeading.parentElement).toHaveTextContent('评论管理共 1 条评论')
+    expect(pageHeading.parentElement).toHaveClass('border-b', 'pb-3')
+    expect(commentList).toHaveClass('border-b')
+    expect(commentList).not.toHaveClass('border-y', 'rounded-2xl', 'bg-white/70')
+    expect(commentContent.closest('li')?.firstElementChild).toHaveClass('pl-3', 'pr-[0.1875rem]', 'py-2.5', 'lg:items-center')
+    const activeFilter = screen.getByRole('button', { name: /待审核/ })
+    expect(activeFilter.querySelector('[aria-hidden="true"]')).toHaveClass('bg-brand-blue')
     expect(axios.get).toHaveBeenCalledWith('/api/admin/comments', {
       params: { page: 0, size: 20, status: 'pending' },
     })

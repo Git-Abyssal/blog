@@ -265,44 +265,42 @@ const AdminComments: React.FC = () => {
         </div>
       )}
 
-      <section aria-busy={loading} className="admin-panel flex min-h-0 flex-1 flex-col overflow-hidden rounded-3xl border border-slate-200/80 bg-white dark:border-slate-800 dark:bg-slate-900">
-        <header className="border-b border-slate-200/80 px-4 py-4 dark:border-slate-800 sm:px-5">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <h1 className="admin-page-title text-xl font-black tracking-[-0.03em] text-slate-950 dark:text-white">评论管理</h1>
-            </div>
+      <section aria-busy={loading} className="admin-list-page flex min-h-0 flex-1 flex-col">
+        <header className="pt-4 sm:pt-5">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-slate-200/90 pb-3 dark:border-slate-800">
+            <h1 className="admin-page-title text-xl font-black tracking-[-0.03em] text-slate-950 dark:text-white">评论管理</h1>
+            {!loading && !loadError && (
+              <span className="text-sm font-medium text-slate-500 dark:text-slate-400" aria-live="polite">
+                共 {totalElements} 条评论
+              </span>
+            )}
+          </div>
 
-            <div className="admin-tabs inline-flex w-fit gap-1 rounded-2xl bg-slate-100 p-1 dark:bg-slate-800/80" role="group" aria-label="评论筛选">
-              {filters.map((item) => {
-                const active = filter === item.value
-                return (
-                  <button
-                    key={item.value}
-                    type="button"
-                    onClick={() => changeFilter(item.value)}
-                    disabled={loading}
-                    aria-pressed={active}
-                    className={`min-h-10 rounded-xl px-3.5 py-1.5 text-center text-sm font-semibold transition-[background-color,color,box-shadow] focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue disabled:cursor-wait disabled:opacity-60 ${
-                      active
-                        ? 'bg-white text-brand-blue shadow-sm dark:bg-slate-900 dark:text-blue-300'
-                        : 'text-slate-500 hover:text-slate-950 dark:text-slate-400 dark:hover:text-white'
-                    }`}
-                  >
-                    {item.label}
-                  </button>
-                )
-              })}
-            </div>
+          <div className="admin-tabs category-scroll mt-2 flex items-center gap-1.5 overflow-x-auto border-b border-slate-200/90 dark:border-slate-800" role="group" aria-label="评论筛选">
+            {filters.map((item) => {
+              const active = filter === item.value
+              return (
+                <button
+                  key={item.value}
+                  type="button"
+                  onClick={() => changeFilter(item.value)}
+                  disabled={loading}
+                  aria-pressed={active}
+                  className={`relative min-h-11 shrink-0 rounded-xl px-3 py-2 text-center text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue disabled:cursor-wait disabled:opacity-60 ${
+                    active
+                      ? 'text-slate-950 dark:text-white'
+                      : 'text-slate-600 hover:text-slate-950 dark:text-slate-400 dark:hover:text-white'
+                  }`}
+                >
+                  {item.label}
+                  {active && <span className="absolute inset-x-3 bottom-0 h-0.5 rounded-full bg-brand-blue" aria-hidden />}
+                </button>
+              )
+            })}
           </div>
         </header>
 
-        <div className="flex-1 p-4 sm:p-5">
-          {!loading && !loadError && (
-            <div className="mb-2 text-sm text-slate-500 dark:text-slate-400">
-              <span>共 {totalElements} 条</span>
-            </div>
-          )}
-
+        <div className="flex-1 pb-8">
           {loading ? (
             <div className="flex min-h-48 flex-col items-center justify-center gap-3 text-slate-600 dark:text-slate-400" role="status">
               <Loader2 className="h-8 w-8 animate-spin text-brand-blue" aria-hidden />
@@ -322,13 +320,13 @@ const AdminComments: React.FC = () => {
               <h2 className="mt-4 font-bold text-slate-900 dark:text-white">{filter === 'pending' ? '没有待审核评论' : '这里还没有评论'}</h2>
             </div>
           ) : (
-            <ul className="admin-list divide-y divide-slate-200 overflow-hidden rounded-2xl border border-slate-200 bg-white/70 dark:divide-slate-700 dark:border-slate-700 dark:bg-slate-900/50">
+            <ul className="admin-list divide-y divide-slate-200/90 border-b border-slate-200/90 dark:divide-slate-800 dark:border-slate-800">
               {comments.map((comment) => {
                 const pending = comment.status === 'pending'
                 const displayName = comment.ownerComment ? '站长' : (comment.guestName || '访客')
                 return (
                   <li key={comment.id} className="overflow-hidden transition-colors hover:bg-slate-50/80 dark:hover:bg-slate-800/55">
-                    <div className="flex flex-col gap-2.5 px-4 py-3 lg:flex-row lg:items-start">
+                    <div className="flex flex-col gap-2.5 py-2.5 pl-3 pr-[0.1875rem] lg:flex-row lg:items-center">
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
                           <span className="font-bold text-slate-950 dark:text-white">{displayName}</span>

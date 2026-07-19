@@ -215,12 +215,19 @@ const AdminTags: React.FC = () => {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <section aria-busy={loading} className="admin-panel flex min-h-0 flex-1 flex-col overflow-hidden rounded-3xl border border-slate-200/80 bg-white dark:border-slate-800 dark:bg-slate-900">
-        <header className="shrink-0 border-b border-slate-200/80 px-4 py-4 dark:border-slate-800 sm:px-5">
-          <h1 className="admin-page-title text-xl font-black tracking-[-0.03em] text-slate-950 dark:text-white">标签管理</h1>
+      <section aria-busy={loading} className="admin-list-page flex min-h-0 flex-1 flex-col">
+        <header className="shrink-0 border-b border-slate-200/90 pb-4 pt-4 dark:border-slate-800 sm:pt-5">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <h1 className="admin-page-title text-xl font-black tracking-[-0.03em] text-slate-950 dark:text-white">标签管理</h1>
+            {!loading && !loadError && (
+              <span className="text-sm font-medium text-slate-500 dark:text-slate-400" aria-live="polite">
+                共 {totalElements} 个标签
+              </span>
+            )}
+          </div>
         </header>
 
-        <div className="flex-1 overflow-auto p-4 sm:p-5">
+        <div className="flex-1 overflow-auto pb-8 pt-4">
           {loading ? (
             <div className="flex min-h-48 flex-col items-center justify-center gap-3" role="status">
               <span className="h-8 w-8 animate-spin rounded-full border-2 border-brand-blue border-t-transparent" aria-hidden />
@@ -237,17 +244,15 @@ const AdminTags: React.FC = () => {
             </div>
           ) : (
             <>
-              <form onSubmit={handleCreate} className="mb-5 w-full rounded-2xl border border-slate-200 bg-slate-50/70 p-3 dark:border-slate-700 dark:bg-slate-800/45 sm:p-4">
-                <label htmlFor="admin-tag-name" className="mb-1.5 block text-sm font-semibold text-slate-700 dark:text-slate-300">
-                  新增标签
-                </label>
-                <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-2.5">
+              <form onSubmit={handleCreate} className="w-full border-b border-slate-200/90 pb-4 dark:border-slate-800">
+                <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2.5">
                   <input
                     id="admin-tag-name"
+                    aria-label="新增标签"
                     value={newName}
                     onChange={(event) => setNewName(event.target.value)}
                     maxLength={30}
-                    className="control-field h-11 min-w-0 rounded-xl border border-slate-300 bg-white px-4 text-slate-950 shadow-sm outline-none transition-[border-color,box-shadow] placeholder:text-slate-500 hover:border-slate-400 focus:border-brand-blue focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+                    className="control-field h-11 w-full min-w-0 rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-950 shadow-sm outline-none transition-[border-color,box-shadow] placeholder:text-slate-500 hover:border-slate-400 focus:border-brand-blue focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-400 dark:focus:border-blue-400"
                     placeholder="输入标签名称"
                   />
                   <button type="submit" disabled={submitting} className="admin-action admin-action-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue disabled:pointer-events-none disabled:opacity-50">
@@ -258,21 +263,13 @@ const AdminTags: React.FC = () => {
               </form>
 
               <div>
-                <h2 className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-600 dark:text-slate-300">
-                  <span>当前标签</span>
-                  <span className="font-mono text-xs text-slate-500 dark:text-slate-400">{totalElements}</span>
-                  {tags.length > 1 && (
-                    <span className="ml-auto text-xs font-normal text-slate-500 dark:text-slate-400">拖动手柄排序</span>
-                  )}
-                </h2>
-
                 {tags.length === 0 ? (
                   <div className="flex flex-col items-center justify-center border-y border-slate-200 py-10 text-center dark:border-slate-700">
                     <TagIcon className="mb-3 h-9 w-9 text-slate-300 dark:text-slate-600" aria-hidden />
                     <p className="text-sm font-semibold text-slate-600 dark:text-slate-300">暂无标签</p>
                   </div>
                 ) : (
-                  <ul className="admin-list divide-y divide-slate-200 overflow-hidden rounded-2xl border border-slate-200 bg-white/70 dark:divide-slate-700 dark:border-slate-700 dark:bg-slate-900/50">
+                  <ul className="admin-list divide-y divide-slate-200/90 border-b border-slate-200/90 dark:divide-slate-800 dark:border-slate-800">
                     {tags.map((tag) => (
                       <li
                         key={tag.id}
@@ -282,7 +279,7 @@ const AdminTags: React.FC = () => {
                           event.dataTransfer.dropEffect = 'move'
                         }}
                         onDrop={(event) => event.preventDefault()}
-                        className={`flex items-center justify-between gap-3 px-3 py-3 transition-[background-color,opacity,box-shadow] hover:bg-slate-50/80 dark:hover:bg-slate-800/60 ${
+                        className={`flex items-center justify-between gap-3 py-2.5 pl-1.5 pr-[0.1875rem] transition-[background-color,opacity,box-shadow] hover:bg-slate-50/80 dark:hover:bg-slate-800/60 ${
                           draggingId === tag.id ? 'opacity-50' : ''
                         }`}
                       >

@@ -46,6 +46,46 @@ describe('AdminArticles', () => {
     expect(screen.getByRole('status')).toHaveTextContent(/^加载中$/)
   })
 
+  it('renders the article list as a flat divided section', async () => {
+    vi.mocked(axios.get).mockImplementation((url: string) => {
+      if (url === '/api/admin/categories' || url === '/api/admin/tags') {
+        return Promise.resolve({ data: { content: [] } })
+      }
+      if (url.startsWith('/api/admin/articles?')) {
+        return Promise.resolve({
+          data: {
+            content: [{ id: 1, title: '扁平列表文章', status: 'published', views: 8 }],
+            totalElements: 1,
+            totalPages: 1,
+            number: 0,
+            size: 10,
+          },
+        })
+      }
+      return Promise.reject(new Error(`Unexpected GET ${url}`))
+    })
+
+    render(
+      <MemoryRouter>
+        <AdminArticles />
+      </MemoryRouter>,
+    )
+
+    const articleTitle = await screen.findByText('扁平列表文章')
+    const articleList = articleTitle.closest('.admin-list')
+    const pageHeading = screen.getByRole('heading', { name: '文章管理' })
+    expect(pageHeading.parentElement).toHaveTextContent('文章管理共 1 篇文章')
+    expect(pageHeading.parentElement).toHaveClass('border-b', 'pb-3', 'mb-3')
+    expect(articleList?.tagName).toBe('UL')
+    expect(articleList).toHaveClass('border-b')
+    expect(articleList).not.toHaveClass('border-y', 'rounded-2xl', 'bg-white/70')
+    expect(articleTitle.closest('li')).toHaveClass('pl-3', 'pr-[0.1875rem]', 'py-2.5', 'sm:items-center')
+    expect(screen.getByLabelText('搜索文章')).toHaveClass('px-3')
+    expect(screen.getByRole('button', { name: '搜索' })).toHaveClass('admin-search-action')
+    expect(screen.queryByText('操作')).not.toBeInTheDocument()
+    expect(screen.getByRole('combobox', { name: '文章状态' })).toHaveClass('pl-3', 'pr-[0.8125rem]')
+  })
+
   it('sends status, category and tag filters to the paged admin endpoint', async () => {
     render(
       <MemoryRouter>
