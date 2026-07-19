@@ -47,6 +47,17 @@ describe('App', () => {
     expect(await screen.findByRole('heading', { name: '页面不存在' })).toBeInTheDocument()
   })
 
+  it('shows only the article loading state while opening an article route', async () => {
+    window.history.pushState({}, '', '/article/1')
+    vi.mocked(axios.get).mockImplementation(() => new Promise<never>(() => undefined))
+
+    render(<App />)
+
+    expect(await screen.findByRole('status', { name: '正在加载文章' })).toBeInTheDocument()
+    expect(screen.queryByText('正在加载页面…')).not.toBeInTheDocument()
+    expect(screen.getAllByRole('status')).toHaveLength(1)
+  })
+
   it('keeps focus for same-page query updates but resets it after a pathname change', async () => {
     window.history.pushState({}, '', '/route')
     const scrollTo = vi.spyOn(window, 'scrollTo')

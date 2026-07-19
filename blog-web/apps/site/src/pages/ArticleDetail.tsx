@@ -24,10 +24,11 @@ import { useThreadedComments } from '@shared/hooks/useApi'
 import { useRefreshOnWindowFocus } from '@shared/hooks/useRefreshOnWindowFocus'
 import SEO from '../components/SEO'
 import TableOfContents from '../components/TableOfContents'
+import ArticleLoadingState from '../components/ArticleLoadingState'
 import Avatar from '@shared/components/Avatar'
 import { remarkHeadingIds } from '../lib/headings'
 import {
-  MessageSquare, ChevronLeft, Calendar, Send,
+  MessageSquare, ChevronLeft, ChevronRight, Calendar, Send,
   ChevronDown, ChevronUp, CheckCircle, AlertTriangle,
   Share2, RefreshCw,
 } from 'lucide-react'
@@ -95,6 +96,7 @@ const ArticleDetail: React.FC = () => {
   const [relatedArticles, setRelatedArticles] = useState<Article[]>([])
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [commentsPage, setCommentsPage] = useState(0)
+  const [mobileActionsOpen, setMobileActionsOpen] = useState(false)
   const commentSectionRef = useRef<HTMLDivElement>(null)
   const focusedRefreshRequestRef = useRef(0)
 
@@ -274,6 +276,12 @@ const ArticleDetail: React.FC = () => {
     const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
     commentSectionRef.current?.scrollIntoView({ behavior })
     commentSectionRef.current?.focus({ preventScroll: true })
+    setMobileActionsOpen(false)
+  }
+
+  const copyArticleLink = async () => {
+    await copyToClipboard(window.location.href, '链接已复制')
+    setMobileActionsOpen(false)
   }
 
   // ========== Comment rendering ==========
@@ -305,14 +313,7 @@ const ArticleDetail: React.FC = () => {
 
   // ========== Loading / Not Found ==========
   if (loading) {
-    return (
-      <div className="flex h-96 items-center justify-center" role="status" aria-busy="true">
-        <div className="flex flex-col items-center gap-2">
-          <div className="h-7 w-7 animate-spin rounded-full border-2 border-slate-300 border-t-brand-blue dark:border-slate-700 dark:border-t-blue-300" aria-hidden></div>
-          <span className="text-sm text-slate-600 dark:text-slate-400">正在加载文章…</span>
-        </div>
-      </div>
-    )
+    return <ArticleLoadingState />
   }
 
   if (!article && articleLoadError === 'not-found') {
@@ -355,27 +356,43 @@ const ArticleDetail: React.FC = () => {
         </div>
       )}
 
-      {/* Mobile bottom action bar */}
-      <div className="fixed bottom-[max(0.75rem,env(safe-area-inset-bottom))] left-4 right-4 z-40 flex items-center justify-center gap-16 rounded-2xl border border-slate-200 bg-white/95 py-2 shadow-lg backdrop-blur-sm dark:border-slate-700 dark:bg-slate-900/95 lg:hidden">
-        <button type="button" onClick={scrollToComments} className="flex min-h-11 items-center gap-2 rounded-xl px-4 text-slate-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue dark:text-slate-400" aria-label="查看评论">
-          <MessageSquare className="h-5 w-5" />
-          <span className="text-xs">{commentsLoadError ? '—' : commentsTotalElements || 0}</span>
-        </button>
-        <button type="button" onClick={() => copyToClipboard(window.location.href, '链接已复制')} className="flex min-h-11 items-center gap-2 rounded-xl px-4 text-slate-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue dark:text-slate-400">
-          <Share2 className="h-5 w-5" />
-          <span className="text-xs">分享</span>
+      {/* Mobile collapsible action rail */}
+      <div className="fixed bottom-[calc(6rem+env(safe-area-inset-bottom))] right-[env(safe-area-inset-right)] z-40 flex min-h-12 overflow-hidden rounded-l-2xl border border-r-0 border-slate-200 bg-white/95 shadow-lg backdrop-blur-sm dark:border-slate-700 dark:bg-slate-900/95 lg:hidden">
+        {mobileActionsOpen && (
+          <div id="mobile-article-actions" className="flex items-stretch" aria-label="文章快捷操作">
+            <button type="button" onClick={scrollToComments} className="flex min-h-12 items-center gap-2 px-3 text-slate-500 transition hover:text-brand-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-blue dark:text-slate-400" aria-label="查看评论">
+              <MessageSquare className="h-5 w-5" aria-hidden />
+              <span className="text-xs">评论 {commentsLoadError ? '—' : commentsTotalElements || 0}</span>
+            </button>
+            <button type="button" onClick={copyArticleLink} className="flex min-h-12 items-center gap-2 border-l border-slate-200 px-3 text-slate-500 transition hover:text-brand-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-blue dark:border-slate-700 dark:text-slate-400" aria-label="复制文章链接">
+              <Share2 className="h-5 w-5" aria-hidden />
+              <span className="text-xs">复制链接</span>
+            </button>
+          </div>
+        )}
+        <button
+          type="button"
+          onClick={() => setMobileActionsOpen((open) => !open)}
+          className="flex min-h-12 min-w-12 items-center justify-center border-l border-slate-200 text-slate-500 transition hover:text-brand-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-blue dark:border-slate-700 dark:text-slate-400"
+          aria-controls="mobile-article-actions"
+          aria-expanded={mobileActionsOpen}
+          aria-label={mobileActionsOpen ? '收起文章操作' : '展开文章操作'}
+        >
+          {mobileActionsOpen
+            ? <ChevronRight className="h-5 w-5" aria-hidden />
+            : <ChevronLeft className="h-5 w-5" aria-hidden />}
         </button>
       </div>
 
       <SEO article={article} />
-      <div className="mx-auto max-w-[76rem] py-3 pb-[calc(5.5rem+env(safe-area-inset-bottom))] sm:py-4 lg:pb-8">
+      <div className="mx-auto max-w-[76rem] py-3 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:py-4 lg:pb-8">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-8">
           <div className="min-w-0 flex-1">
-            <article className="rounded-3xl border border-slate-300 bg-white px-5 py-6 shadow-sm dark:border-slate-700 dark:bg-slate-900 sm:px-8 sm:py-7 lg:px-12 lg:py-8">
-              <Link to={returnTo} className="-ms-6 mb-5 inline-flex min-h-11 items-center gap-1 rounded-xl px-1 text-base font-medium text-slate-500 transition hover:text-brand-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue dark:text-slate-400">
+            <article className="rounded-3xl border border-slate-300 bg-white px-5 py-4 shadow-sm dark:border-slate-700 dark:bg-slate-900 sm:px-8 sm:py-7 lg:px-12 lg:py-8">
+              <Link to={returnTo} className="-ms-2 mb-3 inline-flex min-h-10 items-center gap-1 rounded-xl px-1 text-base font-medium text-slate-500 transition hover:text-brand-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue dark:text-slate-400 sm:-ms-6 sm:mb-5 sm:min-h-11">
                 <ChevronLeft className="h-4 w-4" aria-hidden /> 返回文章列表
               </Link>
-              <div className="mb-5 flex flex-col items-start gap-3 sm:flex-row sm:justify-between">
+              <div className="mb-3 flex flex-col items-start gap-3 sm:mb-5 sm:flex-row sm:justify-between">
                 <div className="w-full min-w-0 flex-1">
                   <h1 className="display-type break-words whitespace-normal text-3xl font-bold leading-[1.18] tracking-[-0.035em] text-slate-950 sm:text-4xl lg:text-[2.7rem] dark:text-white">
                     {article.title}
@@ -384,12 +401,12 @@ const ArticleDetail: React.FC = () => {
               </div>
 
               {/* Article metadata */}
-              <div className="mb-7 flex flex-wrap items-center gap-x-5 gap-y-2 border-slate-200 pb-5 text-sm text-slate-500 sm:border-b dark:border-slate-700 dark:text-slate-400">
+              <div className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-1 border-slate-200 text-sm text-slate-500 sm:mb-7 sm:gap-x-5 sm:gap-y-2 sm:border-b sm:pb-5 dark:border-slate-700 dark:text-slate-400">
                 <span className="flex items-center gap-1.5"><Calendar className="h-3.5 w-3.5" aria-hidden />{new Date(article.createdAt).toLocaleDateString()}</span>
                 {(article.category?.name || article.tags?.length) && (
                   <div className="flex flex-wrap items-center gap-2 sm:ml-auto">
-                    {article.category?.name && <Link to={`/category/${article.category.id}`} className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg hover:text-brand-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue">{article.category.name}</Link>}
-                    {article.tags?.map((tag) => <Link key={tag.id} to={`/tag/${tag.id}`} className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg hover:text-brand-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue">#{tag.name}</Link>)}
+                    {article.category?.name && <Link to={`/category/${article.category.id}`} className="inline-flex min-h-10 min-w-10 items-center justify-center rounded-lg hover:text-brand-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue sm:min-h-11 sm:min-w-11">{article.category.name}</Link>}
+                    {article.tags?.map((tag) => <Link key={tag.id} to={`/tag/${tag.id}`} className="inline-flex min-h-10 min-w-10 items-center justify-center rounded-lg hover:text-brand-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue sm:min-h-11 sm:min-w-11">#{tag.name}</Link>)}
                   </div>
                 )}
               </div>

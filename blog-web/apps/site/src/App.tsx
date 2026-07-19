@@ -7,6 +7,7 @@ import { ToastProvider } from '@shared/hooks/useToast'
 import { ApiProvider } from '@shared/lib/api'
 import Header from './components/Header'
 import SEO from './components/SEO'
+import ArticleLoadingState from './components/ArticleLoadingState'
 import Home from './pages/Home'
 
 const ArticleDetail = React.lazy(() => import('./pages/ArticleDetail'))
@@ -62,7 +63,14 @@ function App() {
                     <Suspense fallback={<PageLoader />}>
                       <Routes>
                         <Route path="/" element={<Home />} />
-                        <Route path="/article/:id" element={<ArticleDetail />} />
+                        <Route
+                          path="/article/:id"
+                          element={(
+                            <Suspense fallback={<ArticleLoadingState />}>
+                              <ArticleDetail />
+                            </Suspense>
+                          )}
+                        />
                         <Route path="/tag/:id" element={<TagDetail />} />
                         <Route path="/category/:id" element={<CategoryDetail />} />
                         <Route path="/search" element={<SearchResults />} />

@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import axios from 'axios'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -106,7 +106,7 @@ describe('ArticleDetail comments', () => {
       'href',
       '/?tab=latest#articles',
     )
-    expect(returnLink).toHaveClass('-ms-6', 'text-base')
+    expect(returnLink).toHaveClass('-ms-2', 'sm:-ms-6', 'text-base')
     expect(screen.queryByRole('button', { name: '回复' })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: '删除' })).not.toBeInTheDocument()
     expect(screen.queryByRole('link', { name: '编辑' })).not.toBeInTheDocument()
@@ -172,6 +172,28 @@ describe('ArticleDetail comments', () => {
     const date = await screen.findByText(new Date(article.createdAt).toLocaleDateString())
     expect(date.parentElement).toHaveClass('sm:border-b')
     expect(date.parentElement).not.toHaveClass('border-b')
+    expect(date.parentElement).toHaveClass('mb-4', 'sm:mb-7', 'sm:pb-5')
+    expect(date.parentElement).not.toHaveClass('pb-5')
+  })
+
+  it('keeps mobile article actions collapsed until the reader expands them', async () => {
+    renderPage()
+
+    await screen.findByRole('heading', { name: '一篇工程记录' })
+    const expandButton = screen.getByRole('button', { name: '展开文章操作' })
+    expect(expandButton).toHaveAttribute('aria-expanded', 'false')
+    expect(document.getElementById('mobile-article-actions')).not.toBeInTheDocument()
+
+    fireEvent.click(expandButton)
+
+    const actionMenu = document.getElementById('mobile-article-actions')
+    expect(actionMenu).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '收起文章操作' })).toHaveAttribute('aria-expanded', 'true')
+    expect(within(actionMenu as HTMLElement).getByRole('button', { name: '查看评论' })).toBeInTheDocument()
+    expect(within(actionMenu as HTMLElement).getByRole('button', { name: '复制文章链接' })).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: '收起文章操作' }))
+    expect(document.getElementById('mobile-article-actions')).not.toBeInTheDocument()
   })
 
   it('renders a saved Markdown blockquote as a blockquote', async () => {
