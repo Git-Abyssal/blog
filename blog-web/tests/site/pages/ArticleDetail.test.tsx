@@ -152,11 +152,26 @@ describe('ArticleDetail comments', () => {
     })
   })
 
-  it('keeps the article title on one line while allowing it to shrink', async () => {
+  it('keeps a fixed title size and wraps long titles instead of shrinking them', async () => {
     renderPage()
 
     const title = await screen.findByRole('heading', { name: '一篇工程记录' })
-    expect(title).toHaveClass('whitespace-nowrap', 'overflow-hidden', 'text-ellipsis')
+    expect(title).toHaveClass(
+      'break-words',
+      'whitespace-normal',
+      'text-3xl',
+      'sm:text-4xl',
+      'lg:text-[2.7rem]',
+    )
+    expect(title).not.toHaveClass('whitespace-nowrap', 'overflow-hidden', 'text-ellipsis')
+  })
+
+  it('hides the redundant metadata divider on mobile', async () => {
+    renderPage()
+
+    const date = await screen.findByText(new Date(article.createdAt).toLocaleDateString())
+    expect(date.parentElement).toHaveClass('sm:border-b')
+    expect(date.parentElement).not.toHaveClass('border-b')
   })
 
   it('renders a saved Markdown blockquote as a blockquote', async () => {

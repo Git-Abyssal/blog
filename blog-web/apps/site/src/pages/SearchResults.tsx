@@ -41,9 +41,9 @@ const SearchResults: React.FC = () => {
   const sentinelRef = useInfiniteScroll(handleLoadMore)
 
   return (
-    <div className="mx-auto max-w-[69rem] py-8 sm:py-10">
-      <header className="mb-2 border-b border-slate-200 pb-6 dark:border-slate-800">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+    <div className="mx-auto max-w-[69rem] py-5 sm:py-6">
+      <header className="mb-2 border-b border-slate-200 pb-4 dark:border-slate-800">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
           <h1 id="search-results-heading" className="text-2xl font-black tracking-tight text-slate-950 sm:text-3xl dark:text-white">
             {keyword ? `“${keyword}”的搜索结果` : '搜索文章'}
           </h1>

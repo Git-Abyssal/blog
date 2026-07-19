@@ -301,10 +301,7 @@ const AdminComments: React.FC = () => {
 
         <div className="flex-1 pb-8">
           {loading ? (
-            <div className="flex min-h-48 flex-col items-center justify-center gap-3 text-slate-600 dark:text-slate-400" role="status">
-              <Loader2 className="h-8 w-8 animate-spin text-brand-blue" aria-hidden />
-              <p className="text-sm">加载中</p>
-            </div>
+            null
           ) : loadError ? (
             <div className="flex min-h-48 flex-col items-center justify-center border-y border-red-200 px-4 text-center dark:border-red-900/60" role="alert">
               <AlertCircle className="h-10 w-10 text-red-500" aria-hidden />

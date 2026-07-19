@@ -62,12 +62,13 @@ describe('AdminComments', () => {
     vi.mocked(axios.delete).mockResolvedValue({ data: {} })
   })
 
-  it('uses the shared loading copy', () => {
+  it('does not render a second loading indicator', () => {
     vi.mocked(axios.get).mockImplementation(() => new Promise<never>(() => undefined))
 
-    renderPage()
+    const { container } = renderPage()
 
-    expect(screen.getByRole('status')).toHaveTextContent(/^加载中$/)
+    expect(screen.queryByRole('status')).not.toBeInTheDocument()
+    expect(container.querySelector('section[aria-busy="true"]')).toBeInTheDocument()
   })
 
   it('loads pending comments and sends an explicit status for every filter', async () => {

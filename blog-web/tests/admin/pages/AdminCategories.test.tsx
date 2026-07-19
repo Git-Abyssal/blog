@@ -22,12 +22,13 @@ describe('AdminCategories', () => {
     })
   })
 
-  it('uses the shared loading copy', () => {
+  it('does not render a second loading indicator', () => {
     vi.mocked(axios.get).mockImplementation(() => new Promise<never>(() => undefined))
 
-    render(<AdminCategories />)
+    const { container } = render(<AdminCategories />)
 
-    expect(screen.getByRole('status')).toHaveTextContent(/^加载中$/)
+    expect(screen.queryByRole('status')).not.toBeInTheDocument()
+    expect(container.querySelector('section[aria-busy="true"]')).toBeInTheDocument()
   })
 
   it('shows one load error when StrictMode starts the request twice', async () => {

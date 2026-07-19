@@ -467,10 +467,7 @@ const AdminCategories: React.FC = () => {
 
       <div className="flex-1 overflow-auto pb-8 pt-4">
         {loading ? (
-          <div className="flex min-h-48 flex-col items-center justify-center gap-3" role="status">
-            <div className="h-8 w-8 animate-spin rounded-full border-2 border-brand-blue border-t-transparent" aria-hidden />
-            <span className="text-sm text-slate-500 dark:text-slate-400">加载中</span>
-          </div>
+          null
         ) : loadError ? (
           <div className="flex min-h-48 flex-col items-center justify-center border-y border-red-200 text-center dark:border-red-900/60" role="alert">
             <AlertTriangle className="h-9 w-9 text-red-500" aria-hidden />

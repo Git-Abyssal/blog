@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useState, useRef } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { useLocation, useParams, Link } from 'react-router-dom'
 import axios from 'axios'
 import ReactMarkdown from 'react-markdown'
@@ -54,8 +54,6 @@ SyntaxHighlighter.registerLanguage('tsx', tsx)
 SyntaxHighlighter.registerLanguage('typescript', typescript)
 SyntaxHighlighter.registerLanguage('ts', typescript)
 
-const MIN_ARTICLE_TITLE_FONT_SIZE = 14
-
 const extractArticle = (payload: unknown): Article | null => {
   let data = payload
   if (
@@ -98,7 +96,6 @@ const ArticleDetail: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [commentsPage, setCommentsPage] = useState(0)
   const commentSectionRef = useRef<HTMLDivElement>(null)
-  const articleTitleRef = useRef<HTMLHeadingElement>(null)
   const focusedRefreshRequestRef = useRef(0)
 
   const articleId = id ? Number(id) : 0
@@ -166,46 +163,6 @@ const ArticleDetail: React.FC = () => {
     observer.observe(root, { attributes: true, attributeFilter: ['class'] })
     return () => observer.disconnect()
   }, [])
-
-  useLayoutEffect(() => {
-    const title = articleTitleRef.current
-    const container = title?.parentElement
-    if (!title || !container) return
-
-    const fitTitle = () => {
-      title.style.removeProperty('font-size')
-      const availableWidth = title.clientWidth
-      const requiredWidth = title.scrollWidth
-      const baseFontSize = Number.parseFloat(window.getComputedStyle(title).fontSize)
-      if (!availableWidth || !requiredWidth || !baseFontSize || requiredWidth <= availableWidth) return
-
-      const targetWidth = Math.max(availableWidth - 1, 0)
-      let fittedFontSize = Math.max(
-        MIN_ARTICLE_TITLE_FONT_SIZE,
-        baseFontSize * targetWidth / requiredWidth,
-      )
-      for (let attempt = 0; attempt < 3; attempt += 1) {
-        title.style.fontSize = `${fittedFontSize}px`
-        const renderedWidth = title.scrollWidth
-        if (renderedWidth <= availableWidth || fittedFontSize <= MIN_ARTICLE_TITLE_FONT_SIZE) break
-        fittedFontSize = Math.max(
-          MIN_ARTICLE_TITLE_FONT_SIZE,
-          fittedFontSize * targetWidth / renderedWidth,
-        )
-      }
-    }
-
-    fitTitle()
-    let previousWidth = container.clientWidth
-    const resizeObserver = new ResizeObserver(() => {
-      const nextWidth = container.clientWidth
-      if (Math.abs(nextWidth - previousWidth) < 0.5) return
-      previousWidth = nextWidth
-      fitTitle()
-    })
-    resizeObserver.observe(container)
-    return () => resizeObserver.disconnect()
-  }, [article?.title])
 
   useEffect(() => {
     if (!successMessage) return
@@ -419,18 +376,15 @@ const ArticleDetail: React.FC = () => {
                 <ChevronLeft className="h-4 w-4" aria-hidden /> 返回文章列表
               </Link>
               <div className="mb-5 flex flex-col items-start gap-3 sm:flex-row sm:justify-between">
-                <div className="w-full min-w-0 flex-1 [container-type:inline-size]">
-                  <h1
-                    ref={articleTitleRef}
-                    className="display-type overflow-hidden text-ellipsis whitespace-nowrap text-3xl font-bold leading-[1.18] tracking-[-0.035em] text-slate-950 dark:text-white sm:text-[clamp(1.875rem,4.3cqi,2.7rem)]"
-                  >
+                <div className="w-full min-w-0 flex-1">
+                  <h1 className="display-type break-words whitespace-normal text-3xl font-bold leading-[1.18] tracking-[-0.035em] text-slate-950 sm:text-4xl lg:text-[2.7rem] dark:text-white">
                     {article.title}
                   </h1>
                 </div>
               </div>
 
               {/* Article metadata */}
-              <div className="mb-7 flex flex-wrap items-center gap-x-5 gap-y-2 border-b border-slate-200 pb-5 text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400">
+              <div className="mb-7 flex flex-wrap items-center gap-x-5 gap-y-2 border-slate-200 pb-5 text-sm text-slate-500 sm:border-b dark:border-slate-700 dark:text-slate-400">
                 <span className="flex items-center gap-1.5"><Calendar className="h-3.5 w-3.5" aria-hidden />{new Date(article.createdAt).toLocaleDateString()}</span>
                 {(article.category?.name || article.tags?.length) && (
                   <div className="flex flex-wrap items-center gap-2 sm:ml-auto">

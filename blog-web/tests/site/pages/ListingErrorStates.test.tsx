@@ -72,6 +72,16 @@ describe('article listing error states', () => {
   it('does not present a failed category request as an empty category', () => {
     renderRoute('/category/7', '/category/:id', <CategoryDetail />)
 
+    const heading = screen.getByRole('heading', { name: '分类文章' })
+    expect(heading.parentElement).toHaveClass(
+      'flex-wrap',
+      'items-center',
+      'gap-x-3',
+      'gap-y-1',
+    )
+    expect(heading.parentElement).not.toHaveClass('sm:justify-between')
+    expect(heading.closest('header')).toHaveClass('pb-4')
+    expect(heading.closest('header')?.parentElement).toHaveClass('py-5', 'sm:py-6')
     expect(screen.getByText('分类文章暂时加载失败')).toBeInTheDocument()
     expect(screen.queryByText('该分类下暂无文章')).not.toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: '重新加载' }))
