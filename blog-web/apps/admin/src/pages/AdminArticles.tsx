@@ -8,8 +8,6 @@ import {
   CheckCircle,
   Pencil,
   Search,
-  ChevronLeft,
-  ChevronRight,
   ChevronDown,
   Check,
   Loader2,
@@ -19,6 +17,7 @@ import type { Article, Category, Tag } from '@shared/types'
 import { useToast } from '@shared/hooks/useToast'
 import { useDialogFocus } from '@shared/hooks/useDialogFocus'
 import { useRefreshOnWindowFocus } from '@shared/hooks/useRefreshOnWindowFocus'
+import Pagination from '@shared/components/Pagination'
 
 interface PageResponse {
   content: Article[]
@@ -605,29 +604,7 @@ const AdminArticles: React.FC = () => {
               </ul>
 
               {totalPages > 1 && (
-                <div className="mt-4 flex items-center justify-center gap-2 sm:justify-end sm:gap-3 sm:px-3">
-                  <button
-                    type="button"
-                    onClick={() => setPage((p) => Math.max(0, p - 1))}
-                    disabled={page === 0}
-                    className="admin-action admin-action-compact admin-action-secondary min-w-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue disabled:cursor-not-allowed disabled:opacity-40"
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                    <span className="sr-only sm:not-sr-only">上一页</span>
-                  </button>
-                  <span className="font-mono text-xs text-slate-500 dark:text-slate-400">
-                    第 {page + 1} / {totalPages} 页
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
-                    disabled={page >= totalPages - 1}
-                    className="admin-action admin-action-compact admin-action-secondary min-w-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue disabled:cursor-not-allowed disabled:opacity-40"
-                  >
-                    <span className="sr-only sm:not-sr-only">下一页</span>
-                    <ChevronRight className="h-4 w-4" />
-                  </button>
-                </div>
+                <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} disabled={loading} />
               )}
             </>
           )}

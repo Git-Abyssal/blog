@@ -35,11 +35,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange, disabled = false }:
     'inline-flex h-11 min-w-11 items-center justify-center rounded-xl border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-600 transition-colors hover:border-brand-blue hover:text-brand-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-35 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-blue-400 dark:hover:text-blue-300 dark:focus-visible:ring-offset-slate-950'
 
   return (
-    <nav className="flex flex-col items-center justify-between gap-4 border-t border-slate-200/80 px-1 pt-6 sm:flex-row dark:border-slate-800" aria-label="文章分页">
-      <p className="font-mono text-[11px] font-semibold tracking-[0.12em] text-slate-600 dark:text-slate-400">
-        PAGE {String(currentPage + 1).padStart(2, '0')} / {String(totalPages).padStart(2, '0')}
-      </p>
-
+    <nav className="mt-4 flex items-center justify-center px-1 sm:justify-end sm:px-3" aria-label="分页导航">
       <div className="flex items-center gap-1.5">
         <button
           type="button"
@@ -57,9 +53,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange, disabled = false }:
               key={item}
               type="button"
               className={`${controlClass} ${currentPage === item ? 'inline-flex' : 'hidden sm:inline-flex'} ${
-                currentPage === item
-                  ? '!border-brand-blue !bg-brand-blue !text-white'
-                  : ''
+                currentPage === item ? '!border-brand-blue !bg-brand-blue !text-white' : ''
               }`}
               onClick={() => onPageChange(item)}
               disabled={disabled}

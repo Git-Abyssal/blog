@@ -37,15 +37,24 @@ describe('ArticleCard', () => {
   it('vertically centers the text and cover image in the article row', () => {
     render(
       <MemoryRouter>
-        <ArticleCard article={{ ...article, coverImage: '/cover.png' }} />
+        <ArticleCard
+          article={{
+            ...article,
+            coverImage: '/cover.png',
+            category: { id: 1, name: '前端开发' },
+            tags: [{ id: 2, name: 'React' }],
+          }}
+        />
       </MemoryRouter>,
     )
 
     const coverLink = screen.getByRole('link', { name: '阅读《保留返回位置》' })
     expect(coverLink.parentElement).toHaveClass('items-center')
-    expect(coverLink.previousElementSibling).toHaveClass('-translate-y-1.5')
+    expect(coverLink.previousElementSibling).toHaveClass('-translate-y-1')
     expect(coverLink).toHaveClass('h-24', 'lg:w-36')
     expect(coverLink).not.toHaveClass('lg:h-28', 'lg:w-40')
-    expect(coverLink.closest('article')).toHaveClass('py-3.5')
+    expect(coverLink.closest('article')).toHaveClass('py-2.5')
+    expect(screen.getByRole('link', { name: '前端开发' })).toHaveClass('min-h-8')
+    expect(screen.getByRole('link', { name: '#React' })).toHaveClass('min-h-8')
   })
 })

@@ -282,7 +282,7 @@ describe('AdminComments', () => {
     renderPage()
     expect(await screen.findByText('等待审核的评论')).toBeInTheDocument()
 
-    expect(screen.getByRole('button', { name: '下一页' }).parentElement).toHaveClass('justify-center', 'sm:justify-end', 'sm:px-3')
+    expect(screen.getByRole('navigation', { name: '分页导航' })).toHaveClass('justify-center', 'sm:justify-end', 'sm:px-3')
     fireEvent.click(screen.getByRole('button', { name: '下一页' }))
     expect(await screen.findByText('第二页唯一一条评论')).toBeInTheDocument()
 

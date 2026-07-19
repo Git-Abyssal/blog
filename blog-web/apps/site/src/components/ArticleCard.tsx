@@ -30,15 +30,15 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article }) => {
   const articleLinkState = { returnTo }
 
   return (
-    <article className="py-3.5 first:pt-3.5">
+    <article className="py-2.5 first:pt-2.5">
       <div className="flex items-center gap-5 sm:gap-8">
-        <div className="-translate-y-1.5 min-w-0 flex-1">
-          <div className="mb-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] leading-5 text-slate-600 dark:text-slate-400">
+        <div className="-translate-y-1 min-w-0 flex-1">
+          <div className="mb-0.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] leading-5 text-slate-600 dark:text-slate-400">
             {publishedAt && <time className="utility-type text-[11px] tracking-[0.04em]" dateTime={article.createdAt}>{publishedAt}</time>}
             {article.category?.name && (
               <Link
                 to={`/category/${article.category.id}`}
-                className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg font-medium text-brand-blue transition-colors hover:text-blue-800 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue dark:text-blue-400 dark:hover:text-blue-300"
+                className="inline-flex min-h-8 min-w-8 items-center justify-center rounded-lg font-medium text-brand-blue transition-colors hover:text-blue-800 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue dark:text-blue-400 dark:hover:text-blue-300"
               >
                 {article.category.name}
               </Link>
@@ -47,7 +47,7 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article }) => {
               <Link
                 key={tag.id}
                 to={`/tag/${tag.id}`}
-                className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg transition-colors hover:text-brand-blue hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue dark:hover:text-blue-400"
+                className="inline-flex min-h-8 min-w-8 items-center justify-center rounded-lg transition-colors hover:text-brand-blue hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue dark:hover:text-blue-400"
               >
                 #{tag.name}
               </Link>
@@ -67,7 +67,7 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article }) => {
             </p>
           </Link>
 
-          <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-600 dark:text-slate-400">
+          <div className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-600 dark:text-slate-400">
             <span className="inline-flex items-center gap-1.5" aria-label={`${article.views || 0} 次阅读`}>
               <Eye className="h-3.5 w-3.5" aria-hidden />
               {compactNumber(article.views)}

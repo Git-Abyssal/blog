@@ -368,7 +368,9 @@ describe('Home Page', () => {
       expect(axios.get).toHaveBeenCalledWith('/api/articles', {
         params: expect.objectContaining({ page: 1, size: 10 }),
       })
-      expect(screen.getByText('PAGE 02 / 03')).toBeInTheDocument()
+      expect(screen.queryByText('PAGE 02 / 03')).not.toBeInTheDocument()
+      expect(screen.getByRole('button', { name: '第 2 页' })).toHaveAttribute('aria-current', 'page')
+      expect(screen.getByRole('navigation', { name: '分页导航' })).toHaveClass('sm:justify-end', 'sm:px-3')
       expect(screen.getByRole('heading', { name: '文章列表' })).toHaveFocus()
     })
   })

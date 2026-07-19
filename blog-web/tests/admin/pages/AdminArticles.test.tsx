@@ -90,7 +90,8 @@ describe('AdminArticles', () => {
     const statusFilter = screen.getByRole('combobox', { name: '文章状态' })
     expect(statusFilter).toHaveClass('pl-3', 'pr-[0.8125rem]')
     expect(statusFilter.closest('.grid')?.parentElement).toHaveClass('px-3')
-    expect(screen.getByRole('button', { name: '下一页' }).parentElement).toHaveClass('justify-center', 'sm:justify-end', 'sm:px-3')
+    expect(screen.getByRole('navigation', { name: '分页导航' })).toHaveClass('justify-center', 'sm:justify-end', 'sm:px-3')
+    expect(screen.getByRole('button', { name: '第 1 页' })).toHaveAttribute('aria-current', 'page')
   })
 
   it('sends status, category and tag filters to the paged admin endpoint', async () => {
