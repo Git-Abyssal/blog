@@ -24,7 +24,7 @@ const AdminHeader = () => {
         <div className="mx-auto flex h-[4.5rem] max-w-[72rem] items-center justify-between gap-4">
           <Link to="/" className="inline-flex min-h-11 items-center gap-2.5 rounded-lg pr-3 text-slate-800 outline-none transition-colors hover:text-brand-blue focus-visible:ring-2 focus-visible:ring-brand-blue dark:text-slate-100" aria-label="后台管理首页">
             <span className="h-5 w-0.5 bg-brand-blue" aria-hidden />
-            <span className="utility-type text-[11px] font-bold tracking-[0.2em]">LOG / CONTROL</span>
+            <span className="utility-type text-[11px] font-bold tracking-[0.2em]">ABYSSAL / ADMIN</span>
           </Link>
           <div className="flex items-center gap-2">
             <ThemeToggle />

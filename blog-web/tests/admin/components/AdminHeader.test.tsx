@@ -36,5 +36,6 @@ describe('AdminHeader', () => {
 
     expect(screen.getByRole('link', { name: '修改密码' })).toHaveClass('h-11', 'w-11', 'border', 'border-transparent')
     expect(screen.getByRole('button', { name: '退出登录' })).toHaveClass('h-11', 'w-11', 'border', 'border-transparent')
+    expect(screen.getByRole('link', { name: '后台管理首页' })).toHaveTextContent('ABYSSAL / ADMIN')
   })
 })
