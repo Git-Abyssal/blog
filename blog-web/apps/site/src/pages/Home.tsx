@@ -162,7 +162,7 @@ const Home: React.FC = () => {
           </nav>
 
           <section className="min-w-0" aria-labelledby="article-list-heading">
-            <div className="flex items-center gap-7 border-b border-slate-200/90 dark:border-slate-800">
+            <div className="flex items-center gap-1.5 border-b border-slate-200/90 dark:border-slate-800">
               {(['latest', 'hot'] as const).map((item) => {
                 const active = tabFromUrl === item
                 return (
@@ -170,7 +170,7 @@ const Home: React.FC = () => {
                     key={item}
                     type="button"
                     onClick={() => handleTab(item)}
-                    className={`relative py-3 text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue focus-visible:ring-offset-2 ${
+                    className={`relative px-3 py-3 text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue focus-visible:ring-offset-2 ${
                       active ? 'text-slate-950 dark:text-white' : 'text-slate-600 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
                     }`}
                     aria-pressed={active}
@@ -179,7 +179,7 @@ const Home: React.FC = () => {
                     {item === 'latest' ? '最新文章' : '本周热榜'}
                     {active && (
                       <span
-                        className={`absolute inset-x-0 bottom-0 h-0.5 rounded-full bg-brand-blue ${
+                        className={`absolute inset-x-3 bottom-0 h-0.5 rounded-full bg-brand-blue ${
                           isFetching && !loading ? 'motion-safe:animate-pulse' : ''
                         }`}
                         aria-hidden
