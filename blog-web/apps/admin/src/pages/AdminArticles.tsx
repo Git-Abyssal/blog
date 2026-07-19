@@ -605,7 +605,7 @@ const AdminArticles: React.FC = () => {
               </ul>
 
               {totalPages > 1 && (
-                <div className="mt-4 flex items-center justify-center gap-2 sm:gap-3">
+                <div className="mt-4 flex items-center justify-center gap-2 sm:justify-end sm:gap-3 sm:px-3">
                   <button
                     type="button"
                     onClick={() => setPage((p) => Math.max(0, p - 1))}

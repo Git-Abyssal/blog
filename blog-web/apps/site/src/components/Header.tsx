@@ -46,7 +46,7 @@ const Header: React.FC = () => {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-slate-200/70 bg-[rgba(243,246,250,0.86)] backdrop-blur-xl dark:border-slate-800/80 dark:bg-[#0b111b]">
-      <div className="mx-auto flex h-[4.5rem] max-w-[72rem] items-center justify-between gap-4 px-4 sm:px-6">
+      <div className="mx-auto flex h-16 max-w-[72rem] items-center justify-between gap-4 px-4 sm:px-6">
         <Link
           to="/"
           aria-label="返回文章首页"

@@ -21,6 +21,7 @@ describe('public header', () => {
     expect(screen.getByRole('link', { name: '返回文章首页' })).toHaveAttribute('href', '/')
     expect(screen.getByRole('searchbox', { name: '搜索文章' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: '切换主题' })).toBeInTheDocument()
+    expect(screen.getByRole('banner').firstElementChild).toHaveClass('h-16')
   })
 
   it('removes the global header from article detail pages', () => {

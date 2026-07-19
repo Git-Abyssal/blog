@@ -596,7 +596,7 @@ const AdminCategories: React.FC = () => {
           )}
 
           {!loading && !loadError && totalPages > 1 && (
-            <div className="mt-4 flex items-center justify-center gap-2 sm:gap-3">
+            <div className="mt-4 flex items-center justify-center gap-2 sm:justify-end sm:gap-3 sm:px-3">
               <button
                 type="button"
                 onClick={() => setPage((current) => Math.max(0, current - 1))}

@@ -62,7 +62,7 @@ const CategoryDetail: React.FC = () => {
           </div>
         ) : articles.length > 0 ? (
           <>
-            <div className="divide-y divide-slate-200 dark:divide-slate-800">
+            <div className="divide-y divide-slate-200 border-b border-slate-200 dark:divide-slate-800 dark:border-slate-800">
               {articles.map((article: any) => (
                 <ArticleCard key={article.id} article={article} />
               ))}

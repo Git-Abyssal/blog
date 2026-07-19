@@ -30,10 +30,10 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article }) => {
   const articleLinkState = { returnTo }
 
   return (
-    <article className="py-5 first:pt-5">
-      <div className="flex gap-5 sm:gap-8">
-        <div className="min-w-0 flex-1">
-          <div className="mb-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] leading-5 text-slate-600 dark:text-slate-400">
+    <article className="py-3.5 first:pt-3.5">
+      <div className="flex items-center gap-5 sm:gap-8">
+        <div className="-translate-y-1.5 min-w-0 flex-1">
+          <div className="mb-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] leading-5 text-slate-600 dark:text-slate-400">
             {publishedAt && <time className="utility-type text-[11px] tracking-[0.04em]" dateTime={article.createdAt}>{publishedAt}</time>}
             {article.category?.name && (
               <Link
@@ -62,12 +62,12 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article }) => {
             <h2 className="display-type line-clamp-2 text-[1.16rem] font-bold leading-snug tracking-[-0.02em] text-slate-950 transition-colors group-hover/article:text-brand-blue sm:text-[1.32rem] dark:text-white dark:group-hover/article:text-blue-300">
               {article.title}
             </h2>
-            <p className="mt-1.5 line-clamp-2 text-[15px] leading-6 text-slate-600 dark:text-slate-400">
+            <p className="mt-1 line-clamp-2 text-[15px] leading-6 text-slate-600 dark:text-slate-400">
               {article.summary}
             </p>
           </Link>
 
-          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-600 dark:text-slate-400">
+          <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-600 dark:text-slate-400">
             <span className="inline-flex items-center gap-1.5" aria-label={`${article.views || 0} 次阅读`}>
               <Eye className="h-3.5 w-3.5" aria-hidden />
               {compactNumber(article.views)}
@@ -83,7 +83,7 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article }) => {
           <Link
             to={`/article/${article.id}`}
             state={articleLinkState}
-            className="hidden h-24 w-32 shrink-0 overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 shadow-sm transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue sm:block lg:h-28 lg:w-40 dark:border-slate-700 dark:bg-slate-800"
+            className="hidden h-24 w-32 shrink-0 overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 shadow-sm transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue sm:block lg:w-36 dark:border-slate-700 dark:bg-slate-800"
             aria-label={`阅读《${article.title}》`}
           >
             <img src={article.coverImage} alt="" className="h-full w-full object-cover" />

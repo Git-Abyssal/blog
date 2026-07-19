@@ -55,8 +55,8 @@ describe('AdminArticles', () => {
         return Promise.resolve({
           data: {
             content: [{ id: 1, title: '扁平列表文章', status: 'published', views: 8 }],
-            totalElements: 1,
-            totalPages: 1,
+            totalElements: 11,
+            totalPages: 2,
             number: 0,
             size: 10,
           },
@@ -74,7 +74,7 @@ describe('AdminArticles', () => {
     const articleTitle = await screen.findByText('扁平列表文章')
     const articleList = articleTitle.closest('.admin-list')
     const pageHeading = screen.getByRole('heading', { name: '文章管理' })
-    expect(pageHeading.parentElement).toHaveTextContent('文章管理共 1 篇文章')
+    expect(pageHeading.parentElement).toHaveTextContent('文章管理共 11 篇文章')
     expect(pageHeading.parentElement).toHaveClass('border-b', 'min-h-16', 'mb-3')
     expect(pageHeading.parentElement).not.toHaveClass('pb-3')
     expect(articleList?.tagName).toBe('UL')
@@ -90,6 +90,7 @@ describe('AdminArticles', () => {
     const statusFilter = screen.getByRole('combobox', { name: '文章状态' })
     expect(statusFilter).toHaveClass('pl-3', 'pr-[0.8125rem]')
     expect(statusFilter.closest('.grid')?.parentElement).toHaveClass('px-3')
+    expect(screen.getByRole('button', { name: '下一页' }).parentElement).toHaveClass('justify-center', 'sm:justify-end', 'sm:px-3')
   })
 
   it('sends status, category and tag filters to the paged admin endpoint', async () => {

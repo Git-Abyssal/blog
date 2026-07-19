@@ -381,7 +381,7 @@ const AdminComments: React.FC = () => {
           )}
 
           {!loading && !loadError && totalPages > 1 && (
-            <div className="mt-4 flex items-center justify-center gap-2 sm:gap-3">
+            <div className="mt-4 flex items-center justify-center gap-2 sm:justify-end sm:gap-3 sm:px-3">
               <button type="button" onClick={() => setPage((current) => Math.max(0, current - 1))} disabled={loading || page === 0} className="admin-action admin-action-compact admin-action-secondary min-w-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue disabled:opacity-40">
                 <ChevronLeft className="h-4 w-4" aria-hidden />
                 <span className="sr-only sm:not-sr-only">上一页</span>

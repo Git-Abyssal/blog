@@ -61,6 +61,7 @@ describe('AdminTags', () => {
       params: { page: 0, size: 10 },
     })
 
+    expect(screen.getByRole('button', { name: '下一页' }).parentElement).toHaveClass('justify-center', 'sm:justify-end', 'sm:px-3')
     fireEvent.click(screen.getByRole('button', { name: '下一页' }))
 
     expect(await screen.findByText('Spring Boot')).toBeInTheDocument()

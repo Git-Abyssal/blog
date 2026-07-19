@@ -75,8 +75,11 @@ describe('Home Page', () => {
 
     const categoryNav = screen.getByRole('navigation', { name: '文章分类' })
     expect(categoryNav).toBeInTheDocument()
-    expect(categoryNav).toHaveClass('border-b')
+    expect(categoryNav).toHaveClass('border-b', 'py-1')
+    expect(categoryNav).not.toHaveClass('sm:py-1.5')
     expect(categoryNav).not.toHaveClass('border-y')
+    expect(categoryNav.parentElement?.parentElement).not.toHaveClass('pt-2', 'sm:pt-3')
+    expect(screen.getByRole('button', { name: '最新文章' })).toHaveClass('py-2.5')
 
     expect(document.querySelectorAll('.animate-pulse')).toHaveLength(0)
     expect(screen.queryByRole('status', { name: '正在加载文章' })).not.toBeInTheDocument()
@@ -123,6 +126,7 @@ describe('Home Page', () => {
       expect(screen.getByText('Test Article')).toBeInTheDocument()
     })
 
+    expect(screen.getByText('Test Article').closest('article')?.parentElement).toHaveClass('border-b')
     expect(axios.get).toHaveBeenCalledWith('/api/articles', {
       params: expect.objectContaining({ page: 0, size: 10 }),
     })

@@ -83,6 +83,7 @@ describe('AdminCategories', () => {
     expect(editDialogHeading.parentElement).not.toHaveClass('items-start')
     fireEvent.click(screen.getByRole('button', { name: '关闭' }))
 
+    expect(screen.getByRole('button', { name: '下一页' }).parentElement).toHaveClass('justify-center', 'sm:justify-end', 'sm:px-3')
     fireEvent.click(screen.getByRole('button', { name: '下一页' }))
 
     expect(await screen.findByText('第二页分类')).toBeInTheDocument()

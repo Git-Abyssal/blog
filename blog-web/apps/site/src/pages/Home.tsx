@@ -137,9 +137,9 @@ const Home: React.FC = () => {
     }`
 
   return (
-    <div className="pb-8 pt-2 sm:pt-3">
+    <div className="pb-8">
       <div id="articles" className="mx-auto max-w-[69rem] scroll-mt-24">
-          <nav className="category-scroll flex gap-1.5 overflow-x-auto border-b border-slate-200/90 dark:border-slate-800" aria-label="文章分类">
+          <nav className="category-scroll flex gap-1.5 overflow-x-auto border-b border-slate-200/90 py-1 dark:border-slate-800" aria-label="文章分类">
             <button
               type="button"
               onClick={() => selectCategory(null)}
@@ -170,7 +170,7 @@ const Home: React.FC = () => {
                     key={item}
                     type="button"
                     onClick={() => handleTab(item)}
-                    className={`relative px-3 py-3 text-sm font-semibold transition-colors first:-ml-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue focus-visible:ring-offset-2 ${
+                    className={`relative px-3 py-2.5 text-sm font-semibold transition-colors first:-ml-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue focus-visible:ring-offset-2 ${
                       active ? 'text-slate-950 dark:text-white' : 'text-slate-600 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
                     }`}
                     aria-pressed={active}
@@ -221,7 +221,7 @@ const Home: React.FC = () => {
                 </div>
               ) : articles.length > 0 ? (
                 <div aria-busy={isFetching}>
-                  <div className="divide-y divide-slate-200/80 dark:divide-slate-800">
+                  <div className="divide-y divide-slate-200/80 border-b border-slate-200/80 dark:divide-slate-800 dark:border-slate-800">
                     {articles.map((article) => (
                       <ArticleCard key={article.id} article={article} />
                     ))}

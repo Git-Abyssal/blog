@@ -33,4 +33,19 @@ describe('ArticleCard', () => {
 
     expect(screen.getByText('/search?keyword=Spring')).toBeInTheDocument()
   })
+
+  it('vertically centers the text and cover image in the article row', () => {
+    render(
+      <MemoryRouter>
+        <ArticleCard article={{ ...article, coverImage: '/cover.png' }} />
+      </MemoryRouter>,
+    )
+
+    const coverLink = screen.getByRole('link', { name: '阅读《保留返回位置》' })
+    expect(coverLink.parentElement).toHaveClass('items-center')
+    expect(coverLink.previousElementSibling).toHaveClass('-translate-y-1.5')
+    expect(coverLink).toHaveClass('h-24', 'lg:w-36')
+    expect(coverLink).not.toHaveClass('lg:h-28', 'lg:w-40')
+    expect(coverLink.closest('article')).toHaveClass('py-3.5')
+  })
 })
