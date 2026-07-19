@@ -106,7 +106,12 @@ describe('ArticleDetail comments', () => {
       'href',
       '/?tab=latest#articles',
     )
-    expect(returnLink).toHaveClass('-ms-2', 'sm:-ms-6', 'text-base')
+    expect(returnLink).toHaveClass('relative', 'text-base')
+    expect(returnLink.querySelector('svg')).toHaveClass('absolute', 'right-full')
+    expect(returnLink.parentElement).toHaveClass('border-t', 'border-slate-200')
+    expect(returnLink.parentElement).not.toHaveClass('mb-4')
+    expect(returnLink.parentElement).not.toHaveClass('border-b', 'border-y')
+    expect(returnLink).not.toHaveClass('-ms-2', 'sm:-ms-6', 'gap-1', 'px-1')
     expect(screen.queryByRole('button', { name: '回复' })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: '删除' })).not.toBeInTheDocument()
     expect(screen.queryByRole('link', { name: '编辑' })).not.toBeInTheDocument()
@@ -162,18 +167,96 @@ describe('ArticleDetail comments', () => {
       'text-3xl',
       'sm:text-4xl',
       'lg:text-[2.7rem]',
+      'leading-[1.1]',
+      'sm:leading-[1.1]',
+      'lg:leading-[1.1]',
     )
     expect(title).not.toHaveClass('whitespace-nowrap', 'overflow-hidden', 'text-ellipsis')
   })
 
-  it('hides the redundant metadata divider on mobile', async () => {
+  it('uses dividers instead of cards to structure the article page', async () => {
+    renderPage()
+
+    const title = await screen.findByRole('heading', { name: '一篇工程记录' })
+    const articleElement = title.closest('article')
+    expect(title.parentElement?.parentElement).not.toHaveClass('my-2')
+    expect(articleElement).toHaveClass('lg:pt-0')
+    expect(articleElement).not.toHaveClass('lg:pt-6')
+    expect(articleElement).not.toHaveClass('rounded-3xl', 'border', 'bg-white', 'shadow-sm')
+
+    const date = await screen.findByText(new Date(article.createdAt).toLocaleDateString())
+    expect(date.parentElement).toHaveClass('mb-2.5', 'min-h-10', 'sm:min-h-11', 'lg:border-b')
+    expect(date.parentElement).not.toHaveClass('border-b')
+    expect(date.parentElement).not.toHaveClass('pb-4')
+
+    const comments = screen.getByRole('heading', { name: '评论 1' }).closest('section')
+    expect(comments).toHaveClass('mt-2', 'border-t', 'border-slate-200', 'dark:border-slate-700')
+    expect(comments).not.toHaveClass('border-slate-300')
+    expect(comments).not.toHaveClass('lg:border-t-0')
+    const commentHeadingRow = screen.getByRole('heading', { name: '评论 1' }).parentElement
+    expect(commentHeadingRow).toHaveClass('min-h-14', 'items-center', 'justify-between')
+    expect(comments).not.toHaveClass('rounded-3xl', 'bg-white', 'shadow-sm')
+
+    expect(screen.queryByRole('button', { name: '1 条评论' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '复制链接' }).parentElement?.parentElement).toBe(commentHeadingRow)
+
+    const commentForm = screen.getByLabelText('你的昵称').closest('form')
+    expect(commentForm).toHaveClass('border-y', 'py-4')
+    expect(commentForm).not.toHaveClass('mb-3.5')
+    expect(commentForm).not.toHaveClass('rounded-2xl', 'bg-slate-50')
+    const commentContent = screen.getByLabelText('评论内容')
+    const guestName = screen.getByLabelText('你的昵称')
+    expect(commentContent.compareDocumentPosition(guestName) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    const commentFooter = guestName.parentElement?.parentElement
+    expect(commentFooter).toHaveClass(
+      'mt-4',
+      'flex',
+      'flex-col',
+      'gap-3',
+      'sm:flex-row',
+      'sm:items-end',
+    )
+    expect(guestName.parentElement).toHaveClass('min-w-0', 'flex-1')
+    expect(guestName.parentElement).not.toHaveClass('sm:max-w-sm')
+    expect(screen.getByText('你的昵称', { selector: 'label' })).toHaveClass('block', 'mb-2')
+    expect(guestName).toHaveClass('w-full')
+    expect(guestName).toHaveAttribute('placeholder', '怎么称呼你')
+    expect(screen.getByRole('button', { name: '提交审核' }).parentElement).toBe(commentFooter)
+    expect(screen.getByRole('button', { name: '提交审核' })).toHaveClass('w-full', 'sm:w-auto')
+    expect(commentContent).toHaveClass('block', 'w-full', 'resize-y')
+    expect(commentContent).toHaveAttribute('placeholder', '写下你的想法或问题')
+    expect(commentContent).toHaveAttribute('rows', '4')
+    expect(commentContent.tagName).toBe('TEXTAREA')
+    expect(screen.getByText('0 / 1000')).toBeInTheDocument()
+    expect(screen.queryByText('评论审核通过后公开显示')).not.toBeInTheDocument()
+
+    const commentItem = screen.getByText(guestComment.content).parentElement?.parentElement?.parentElement
+    expect(commentItem).toHaveClass('pt-3.5')
+    expect(commentItem).not.toHaveClass('border-b', 'pb-2')
+    expect(commentItem?.parentElement).toHaveClass('border-b', 'pb-2')
+  })
+
+  it('places the category and tags immediately after the article date', async () => {
+    vi.mocked(axios.get).mockImplementation((url: string) => {
+      if (url === '/api/articles/1') {
+        return Promise.resolve({
+          data: {
+            ...article,
+            category: { id: 1, name: 'AI' },
+            tags: [{ id: 2, name: '工程实践' }],
+          },
+        })
+      }
+      if (url === '/api/articles/1/related') return Promise.resolve({ data: [] })
+      return Promise.reject(new Error(`Unexpected GET ${url}`))
+    })
+
     renderPage()
 
     const date = await screen.findByText(new Date(article.createdAt).toLocaleDateString())
-    expect(date.parentElement).toHaveClass('sm:border-b')
-    expect(date.parentElement).not.toHaveClass('border-b')
-    expect(date.parentElement).toHaveClass('mb-4', 'sm:mb-7', 'sm:pb-5')
-    expect(date.parentElement).not.toHaveClass('pb-5')
+    const metadataLinks = screen.getByRole('link', { name: 'AI' }).parentElement
+    expect(metadataLinks?.previousElementSibling).toBe(date)
+    expect(metadataLinks).not.toHaveClass('sm:ml-auto')
   })
 
   it('keeps mobile article actions collapsed until the reader expands them', async () => {
@@ -231,6 +314,29 @@ describe('ArticleDetail comments', () => {
     expect(container.querySelector('script')).not.toBeInTheDocument()
   })
 
+  it('uses the same subtle divider for related articles', async () => {
+    vi.mocked(axios.get).mockImplementation((url: string) => {
+      if (url === '/api/articles/1') return Promise.resolve({ data: article })
+      if (url === '/api/articles/1/related') {
+        return Promise.resolve({
+          data: [{ ...article, id: 2, title: '下一篇文章' }],
+        })
+      }
+      return Promise.reject(new Error(`Unexpected GET ${url}`))
+    })
+
+    renderPage()
+
+    const relatedSection = (await screen.findByRole('heading', { name: '继续阅读' })).closest('section')
+    expect(relatedSection).toHaveClass('border-y', 'border-slate-200', 'pt-2', 'dark:border-slate-700')
+    expect(relatedSection).not.toHaveClass('border-t')
+    expect(relatedSection).not.toHaveClass('border-slate-300', 'border-slate-400', 'dark:border-slate-600')
+    expect(relatedSection?.closest('aside')).toHaveClass('space-y-2')
+    const relatedLink = screen.getByRole('link', { name: /下一篇文章/ })
+    expect(relatedLink).toHaveClass('py-1')
+    expect(relatedLink.querySelector('p')).toHaveClass('leading-4')
+  })
+
   it('labels owner comments as 站长', async () => {
     vi.mocked(useThreadedComments).mockReturnValue(threadedCommentsResult({
         content: [{
@@ -247,6 +353,39 @@ describe('ArticleDetail comments', () => {
     renderPage()
 
     expect(await screen.findByText('站长')).toBeInTheDocument()
+  })
+
+  it('keeps replies inside the parent comment group before its divider', async () => {
+    const ownerReply = {
+      id: 9,
+      content: '谢谢，回复应该属于上面的读者评论。',
+      ownerComment: true,
+      status: 'approved' as const,
+      createdAt: '2026-07-16T12:00:00',
+      replies: [],
+    }
+    vi.mocked(useThreadedComments).mockReturnValue(threadedCommentsResult({
+      content: [{
+        ...guestComment,
+        replies: [ownerReply],
+      }],
+      totalElements: 1,
+      totalPages: 1,
+      number: 0,
+      size: 20,
+    }))
+
+    renderPage()
+
+    const parentContent = await screen.findByText(guestComment.content)
+    const replyContent = screen.getByText(ownerReply.content)
+    const parentGroup = parentContent.closest('.border-b')
+    const replyItem = replyContent.parentElement?.parentElement?.parentElement
+
+    expect(parentGroup).toHaveClass('border-b', 'pb-2')
+    expect(replyContent.closest('.border-b')).toBe(parentGroup)
+    expect(replyItem).toHaveClass('ml-4', 'mt-3', 'sm:ml-10')
+    expect(replyItem).not.toHaveClass('border-b')
   })
 
   it('distinguishes a missing article from a temporary loading failure', async () => {

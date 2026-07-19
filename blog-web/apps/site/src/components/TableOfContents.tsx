@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { ChevronDown } from 'lucide-react'
 import { extractMarkdownHeadings } from '../lib/headings'
 
@@ -9,6 +9,7 @@ interface TableOfContentsProps {
 
 const TableOfContents: React.FC<TableOfContentsProps> = ({ content, collapsible = false }) => {
   const [activeId, setActiveId] = useState('')
+  const clickedIdRef = useRef('')
   const toc = useMemo(() => extractMarkdownHeadings(content, 3), [content])
 
   useEffect(() => {
@@ -16,6 +17,21 @@ const TableOfContents: React.FC<TableOfContentsProps> = ({ content, collapsible 
 
     const updateActiveHeading = () => {
       const activationLine = 112
+
+      if (clickedIdRef.current) {
+        const clickedIndex = toc.findIndex((item) => item.id === clickedIdRef.current)
+        const clickedHeading = document.getElementById(clickedIdRef.current)
+        const nextHeading = clickedIndex >= 0 && clickedIndex < toc.length - 1
+          ? document.getElementById(toc[clickedIndex + 1].id)
+          : null
+        const clickedIsCurrent = clickedHeading
+          && clickedHeading.getBoundingClientRect().top <= activationLine
+          && (!nextHeading || nextHeading.getBoundingClientRect().top > activationLine)
+
+        if (!clickedIsCurrent) return
+        clickedIdRef.current = ''
+      }
+
       let currentId = toc[0].id
 
       for (const item of toc) {
@@ -46,6 +62,7 @@ const TableOfContents: React.FC<TableOfContentsProps> = ({ content, collapsible 
     event.preventDefault()
     const nextHash = `#${encodeURIComponent(id)}`
     if (window.location.hash !== nextHash) window.history.pushState(null, '', nextHash)
+    clickedIdRef.current = id
     setActiveId(id)
     target.setAttribute('tabindex', '-1')
     const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
@@ -64,7 +81,7 @@ const TableOfContents: React.FC<TableOfContentsProps> = ({ content, collapsible 
             href={`#${item.id}`}
             onClick={(event) => handleHeadingClick(event, item.id)}
             aria-current={isActive ? 'location' : undefined}
-            className={`-ml-px flex min-h-11 items-center rounded-r-lg border-l-2 py-2 pr-1 text-[13px] leading-5 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-brand-blue lg:min-h-0 ${
+            className={`-ml-px flex min-h-11 items-center rounded-r-lg border-l-2 py-2 pr-1 text-[13px] leading-5 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-brand-blue lg:min-h-0 lg:py-0.5 lg:leading-4 ${
               item.level === 3 ? 'pl-6' : 'pl-3'
             } ${
               isActive
@@ -82,7 +99,7 @@ const TableOfContents: React.FC<TableOfContentsProps> = ({ content, collapsible 
 
   if (collapsible) {
     return (
-      <details className="group border-y border-slate-300 dark:border-slate-700">
+      <details className="group border-y border-slate-200 dark:border-slate-700">
         <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-4 text-sm font-bold text-slate-950 outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-blue [&::-webkit-details-marker]:hidden dark:text-white">
           <span>本文目录</span>
           <span className="flex items-center gap-2">
@@ -100,8 +117,8 @@ const TableOfContents: React.FC<TableOfContentsProps> = ({ content, collapsible 
   }
 
   return (
-    <nav aria-label="本文目录" className="border-t border-slate-300 pt-4 dark:border-slate-700">
-      <div className="mb-3 flex items-center justify-between px-1">
+    <nav aria-label="本文目录" className="border-t border-slate-200 pt-2 dark:border-slate-700">
+      <div className="mb-1.5 flex items-center gap-2 px-1">
         <h3 className="text-sm font-bold text-slate-950 dark:text-white">本文目录</h3>
         <span className="utility-type text-[10px] font-medium tracking-wide text-slate-500 dark:text-slate-400">
           {toc.length} 节
