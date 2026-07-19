@@ -139,7 +139,7 @@ const Home: React.FC = () => {
   return (
     <div className="pb-8 pt-2 sm:pt-3">
       <div id="articles" className="mx-auto max-w-[69rem] scroll-mt-24">
-          <nav className="category-scroll flex gap-1.5 overflow-x-auto border-y border-slate-200/90 dark:border-slate-800" aria-label="文章分类">
+          <nav className="category-scroll flex gap-1.5 overflow-x-auto border-b border-slate-200/90 dark:border-slate-800" aria-label="文章分类">
             <button
               type="button"
               onClick={() => selectCategory(null)}

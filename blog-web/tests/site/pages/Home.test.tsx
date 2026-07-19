@@ -73,7 +73,10 @@ describe('Home Page', () => {
   it('keeps fast initial loading visually quiet', async () => {
     renderHome()
 
-    expect(screen.getByRole('navigation', { name: '文章分类' })).toBeInTheDocument()
+    const categoryNav = screen.getByRole('navigation', { name: '文章分类' })
+    expect(categoryNav).toBeInTheDocument()
+    expect(categoryNav).toHaveClass('border-b')
+    expect(categoryNav).not.toHaveClass('border-y')
 
     expect(document.querySelectorAll('.animate-pulse')).toHaveLength(0)
     expect(screen.queryByRole('status', { name: '正在加载文章' })).not.toBeInTheDocument()
