@@ -364,7 +364,7 @@ const AdminCategories: React.FC = () => {
           />
           <div className="relative w-full max-w-md overflow-hidden rounded-3xl border border-slate-300 bg-white shadow-xl dark:border-slate-700 dark:bg-slate-900">
             <div className="p-6">
-              <div className="flex items-start justify-between gap-4">
+              <div className="flex items-center justify-between gap-4">
                 <h3 id="edit-category-title" className="text-lg font-bold text-slate-950 dark:text-white">
                   编辑分类
                 </h3>
@@ -453,7 +453,7 @@ const AdminCategories: React.FC = () => {
       )}
 
       <section aria-busy={loading} className="admin-list-page flex min-h-0 flex-1 flex-col">
-        <header className="shrink-0 border-b border-slate-200/90 pb-4 pt-4 dark:border-slate-800 sm:pt-5">
+        <header className="flex min-h-16 shrink-0 items-center border-b border-slate-200/90 dark:border-slate-800">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
             <h1 className="admin-page-title text-xl font-black tracking-[-0.03em] text-slate-950 dark:text-white">分类管理</h1>
             {!loading && !loadError && (
@@ -488,7 +488,7 @@ const AdminCategories: React.FC = () => {
           </div>
         ) : (
           <>
-            <form onSubmit={handleCreate} className="w-full border-b border-slate-200/90 pb-4 dark:border-slate-800">
+            <form onSubmit={handleCreate} className="w-full border-b border-slate-200/90 px-3 pb-4 dark:border-slate-800">
               <div className="grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-2.5">
                 <input
                   ref={newNameRef}

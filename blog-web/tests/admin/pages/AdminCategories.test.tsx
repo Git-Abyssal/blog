@@ -64,6 +64,7 @@ describe('AdminCategories', () => {
     const categoryList = firstCategory.closest('ul')
     const pageHeading = screen.getByRole('heading', { name: '分类管理' })
     expect(pageHeading.parentElement).toHaveTextContent('分类管理共 11 个分类')
+    expect(pageHeading.closest('header')).toHaveClass('min-h-16', 'items-center')
     expect(categoryList).toHaveClass('border-b')
     expect(categoryList).not.toHaveClass('border-y', 'rounded-2xl', 'bg-white/70')
     expect(firstCategory.closest('li')).toHaveClass('items-center', 'pl-1.5', 'pr-[0.1875rem]', 'py-2.5')
@@ -71,10 +72,16 @@ describe('AdminCategories', () => {
     expect(screen.queryByText('新增分类')).not.toBeInTheDocument()
     expect(screen.getByLabelText('新增分类')).toHaveClass('px-3', 'focus:ring-4', 'focus:ring-blue-500/10', 'dark:bg-slate-800')
     expect(screen.getByLabelText('新增分类')).not.toHaveClass('focus-visible:outline-none')
-    expect(screen.getByLabelText('新增分类').closest('form')).toHaveClass('border-b', 'pb-4')
+    expect(screen.getByLabelText('新增分类').closest('form')).toHaveClass('border-b', 'px-3', 'pb-4')
     expect(axios.get).toHaveBeenCalledWith('/api/admin/categories', {
       params: { page: 0, size: 10 },
     })
+
+    fireEvent.click(screen.getByRole('button', { name: '编辑' }))
+    const editDialogHeading = screen.getByRole('heading', { name: '编辑分类' })
+    expect(editDialogHeading.parentElement).toHaveClass('items-center')
+    expect(editDialogHeading.parentElement).not.toHaveClass('items-start')
+    fireEvent.click(screen.getByRole('button', { name: '关闭' }))
 
     fireEvent.click(screen.getByRole('button', { name: '下一页' }))
 

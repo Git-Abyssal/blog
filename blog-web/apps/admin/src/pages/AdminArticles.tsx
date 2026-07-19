@@ -437,8 +437,8 @@ const AdminArticles: React.FC = () => {
       )}
 
       <section aria-busy={loading} className="admin-list-page flex min-h-0 flex-1 flex-col">
-        <header className="shrink-0 border-b border-slate-200/90 pb-4 pt-4 dark:border-slate-800 sm:pt-5">
-          <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-slate-200/90 pb-3 dark:border-slate-800">
+        <header className="shrink-0 border-b border-slate-200/90 pb-4 dark:border-slate-800">
+          <div className="mb-3 flex min-h-16 flex-wrap items-center gap-x-3 gap-y-1 border-b border-slate-200/90 dark:border-slate-800">
             <h1 className="admin-page-title text-xl font-black tracking-[-0.03em] text-slate-950 dark:text-white">文章管理</h1>
             {!loading && !loadError && (
               <span className="text-sm font-medium text-slate-500 dark:text-slate-400" aria-live="polite">
@@ -447,7 +447,7 @@ const AdminArticles: React.FC = () => {
             )}
           </div>
 
-          <form onSubmit={handleSearch} className="grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-2.5">
+          <form onSubmit={handleSearch} className="grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-2.5 px-3">
             <div className="min-w-0">
               <input
                 aria-label="搜索文章"
@@ -467,7 +467,7 @@ const AdminArticles: React.FC = () => {
             </button>
           </form>
 
-          <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center">
+          <div className="mt-2 flex flex-col gap-2 px-3 sm:flex-row sm:items-center">
             <div className="grid min-w-0 flex-1 grid-cols-1 gap-2 sm:grid-cols-3">
               <FilterSelect
                 ariaLabel="文章状态"
@@ -553,7 +553,7 @@ const AdminArticles: React.FC = () => {
                   >
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="inline-flex min-h-11 max-w-full items-center font-semibold text-slate-950 dark:text-white">
+                        <span className="inline-flex max-w-full items-center font-semibold leading-6 text-slate-950 dark:text-white">
                           <span className="line-clamp-1">{article.title || '未命名'}</span>
                         </span>
                         {article.status === 'draft' && (

@@ -266,8 +266,8 @@ const AdminComments: React.FC = () => {
       )}
 
       <section aria-busy={loading} className="admin-list-page flex min-h-0 flex-1 flex-col">
-        <header className="pt-4 sm:pt-5">
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-slate-200/90 pb-3 dark:border-slate-800">
+        <header>
+          <div className="flex min-h-16 flex-wrap items-center gap-x-3 gap-y-1 border-b border-slate-200/90 dark:border-slate-800">
             <h1 className="admin-page-title text-xl font-black tracking-[-0.03em] text-slate-950 dark:text-white">评论管理</h1>
             {!loading && !loadError && (
               <span className="text-sm font-medium text-slate-500 dark:text-slate-400" aria-live="polite">

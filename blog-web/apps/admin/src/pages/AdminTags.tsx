@@ -216,7 +216,7 @@ const AdminTags: React.FC = () => {
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <section aria-busy={loading} className="admin-list-page flex min-h-0 flex-1 flex-col">
-        <header className="shrink-0 border-b border-slate-200/90 pb-4 pt-4 dark:border-slate-800 sm:pt-5">
+        <header className="flex min-h-16 shrink-0 items-center border-b border-slate-200/90 dark:border-slate-800">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
             <h1 className="admin-page-title text-xl font-black tracking-[-0.03em] text-slate-950 dark:text-white">标签管理</h1>
             {!loading && !loadError && (
@@ -244,7 +244,7 @@ const AdminTags: React.FC = () => {
             </div>
           ) : (
             <>
-              <form onSubmit={handleCreate} className="w-full border-b border-slate-200/90 pb-4 dark:border-slate-800">
+              <form onSubmit={handleCreate} className="w-full border-b border-slate-200/90 px-3 pb-4 dark:border-slate-800">
                 <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2.5">
                   <input
                     id="admin-tag-name"

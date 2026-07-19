@@ -107,7 +107,7 @@ const ChangePassword: React.FC = () => {
           </Link>
         )}
         <section className="admin-auth-card rounded-3xl border border-slate-300 bg-white px-6 py-9 dark:border-slate-700 dark:bg-slate-900 sm:px-10 sm:py-11">
-          <header className="mb-7 flex items-start gap-4 border-b border-slate-200 pb-6 dark:border-slate-700">
+          <header className="mb-7 flex items-center gap-4 border-b border-slate-200 pb-6 dark:border-slate-700">
             <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-950 text-white dark:bg-white dark:text-slate-950">
               <Lock className="h-5 w-5" aria-hidden />
             </span>

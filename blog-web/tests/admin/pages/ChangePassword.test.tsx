@@ -67,6 +67,9 @@ describe('ChangePassword', () => {
     )
 
     expect(screen.queryByRole('link', { name: '返回首页' })).not.toBeInTheDocument()
+    const pageHeader = screen.getByRole('heading', { name: '修改密码' }).closest('header')
+    expect(pageHeader).toHaveClass('items-center')
+    expect(pageHeader).not.toHaveClass('items-start')
   })
 
   it('associates backend complexity errors with the new-password field', async () => {
