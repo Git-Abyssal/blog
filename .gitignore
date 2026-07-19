@@ -1,0 +1,38 @@
+# Maven
+**/target/
+*.jar
+*.war
+*.ear
+
+# Node.js
+**/node_modules/
+**/dist/
+**/build/
+.npm
+*.log
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+
+# Local development tools
+.playwright-cli/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Docker
+mysql_data/
+.env
+uploads/
+
+# Local runtime binaries
+redis-binaries/
+
+# Local config (DB credentials etc.)
+**/application-local.yml
+
+# Frontend build artifacts in blog
+**/src/main/resources/static/

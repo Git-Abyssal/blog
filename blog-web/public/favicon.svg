@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <defs>
+    <linearGradient id="abyss" x1="5" y1="3" x2="27" y2="29" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#123B5D"/>
+      <stop offset="1" stop-color="#07111F"/>
+    </linearGradient>
+  </defs>
+  <rect x="1" y="1" width="30" height="30" rx="8" fill="url(#abyss)"/>
+  <path
+    d="M8.5 24 14.6 8.9c.5-1.2 2.3-1.2 2.8 0L23.5 24"
+    fill="none"
+    stroke="#F2FAFF"
+    stroke-width="3.2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <path
+    d="M12.1 18.2Q16 20.7 19.9 18.2"
+    fill="none"
+    stroke="#38BDF8"
+    stroke-width="2.5"
+    stroke-linecap="round"
+  />
+</svg>

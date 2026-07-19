@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.blog.mapper.AuditLogMapper">
+
+    <select id="selectByFilters" resultType="com.example.blog.entity.AuditLogEntry">
+        SELECT id, timestamp, action, description, username, ip_address AS ipAddress,
+               user_agent AS userAgent, http_method AS httpMethod, request_path AS requestPath,
+               parameters, result, status, error_message AS errorMessage, class_name AS className,
+               method_name AS methodName, duration_ms AS durationMs
+        FROM audit_logs
+        <where>
+            <if test="action != null and action != ''">AND action = #{action}</if>
+            <if test="username != null and username != ''">AND username LIKE CONCAT('%', REPLACE(REPLACE(#{username}, '%', '\\%'), '_', '\\_'), '%') ESCAPE '\\'</if>
+            <if test="startDate != null">AND timestamp &gt;= #{startDate}</if>
+            <if test="endDate != null">AND timestamp &lt;= #{endDate}</if>
+            <if test="status != null and status != ''">AND status = #{status}</if>
+        </where>
+        ORDER BY timestamp DESC
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="countByFilters" resultType="long">
+        SELECT COUNT(*) FROM audit_logs
+        <where>
+            <if test="action != null and action != ''">AND action = #{action}</if>
+            <if test="username != null and username != ''">AND username LIKE CONCAT('%', REPLACE(REPLACE(#{username}, '%', '\\%'), '_', '\\_'), '%') ESCAPE '\\'</if>
+            <if test="startDate != null">AND timestamp &gt;= #{startDate}</if>
+            <if test="endDate != null">AND timestamp &lt;= #{endDate}</if>
+            <if test="status != null and status != ''">AND status = #{status}</if>
+        </where>
+    </select>
+
+    <select id="selectRecentFailedLoginAttempts" resultType="com.example.blog.entity.AuditLogEntry">
+        SELECT id, timestamp, action, description, username, ip_address AS ipAddress,
+               user_agent AS userAgent, http_method AS httpMethod, request_path AS requestPath,
+               parameters, result, status, error_message AS errorMessage, class_name AS className,
+               method_name AS methodName, duration_ms AS durationMs
+        FROM audit_logs
+        WHERE action LIKE 'LOGIN%' AND status = 'FAILURE'
+        ORDER BY timestamp DESC
+        LIMIT #{limit}
+    </select>
+
+    <delete id="deleteByTimestampBefore">
+        DELETE FROM audit_logs WHERE timestamp &lt; #{timestamp} LIMIT 10000
+    </delete>
+</mapper>

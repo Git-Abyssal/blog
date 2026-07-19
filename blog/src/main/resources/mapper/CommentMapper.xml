@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.blog.mapper.CommentMapper">
+
+    <resultMap id="CommentMap" type="com.example.blog.entity.Comment">
+        <id column="id" property="id"/>
+        <result column="content" property="content"/>
+        <result column="owner_comment" property="ownerComment"/>
+        <result column="article_id" property="articleId"/>
+        <result column="guest_name" property="guestName"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="status" property="status"/>
+        <result column="reviewed_at" property="reviewedAt"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="article_title" property="articleTitle"/>
+    </resultMap>
+
+    <select id="selectTopLevelByArticleId" resultMap="CommentMap">
+        SELECT c.id, c.content, c.owner_comment, c.article_id, c.guest_name, c.parent_id,
+               c.status, c.reviewed_at, c.created_at
+        FROM comments c
+        WHERE c.article_id = #{articleId} AND c.parent_id IS NULL AND c.status = 'approved'
+        ORDER BY c.created_at DESC
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="countTopLevelByArticleId" resultType="long">
+        SELECT COUNT(*) FROM comments
+        WHERE article_id = #{articleId} AND parent_id IS NULL AND status = 'approved'
+    </select>
+
+    <select id="selectRepliesByParentIds" resultMap="CommentMap">
+        SELECT c.id, c.content, c.owner_comment, c.article_id, c.guest_name, c.parent_id,
+               c.status, c.reviewed_at, c.created_at
+        FROM (
+            SELECT ranked.*
+            FROM (
+                SELECT c2.*, ROW_NUMBER() OVER (PARTITION BY c2.parent_id ORDER BY c2.created_at ASC) AS rn
+                FROM comments c2
+                WHERE c2.status = 'approved' AND c2.parent_id IN
+                <foreach item="id" collection="parentIds" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            ) ranked
+            WHERE ranked.rn &lt;= 50
+        ) c
+        ORDER BY c.created_at ASC
+    </select>
+
+    <select id="selectByStatus" resultMap="CommentMap">
+        SELECT c.id, c.content, c.owner_comment, c.article_id, c.guest_name, c.parent_id,
+               c.status, c.reviewed_at, c.created_at, a.title AS article_title
+        FROM comments c
+        JOIN articles a ON c.article_id = a.id
+        WHERE c.status = #{status}
+        ORDER BY c.created_at DESC
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="countByStatus" resultType="long">
+        SELECT COUNT(*) FROM comments WHERE status = #{status}
+    </select>
+</mapper>

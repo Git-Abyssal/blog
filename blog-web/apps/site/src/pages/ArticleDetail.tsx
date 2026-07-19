@@ -1,0 +1,678 @@
+import React, { useEffect, useLayoutEffect, useState, useRef } from 'react'
+import { useLocation, useParams, Link } from 'react-router-dom'
+import axios from 'axios'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+import { PrismLight as SyntaxHighlighter } from 'react-syntax-highlighter'
+import { oneDark, oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism'
+import bash from 'react-syntax-highlighter/dist/esm/languages/prism/bash'
+import css from 'react-syntax-highlighter/dist/esm/languages/prism/css'
+import java from 'react-syntax-highlighter/dist/esm/languages/prism/java'
+import javascript from 'react-syntax-highlighter/dist/esm/languages/prism/javascript'
+import json from 'react-syntax-highlighter/dist/esm/languages/prism/json'
+import jsx from 'react-syntax-highlighter/dist/esm/languages/prism/jsx'
+import markdown from 'react-syntax-highlighter/dist/esm/languages/prism/markdown'
+import markup from 'react-syntax-highlighter/dist/esm/languages/prism/markup'
+import python from 'react-syntax-highlighter/dist/esm/languages/prism/python'
+import shellSession from 'react-syntax-highlighter/dist/esm/languages/prism/shell-session'
+import sql from 'react-syntax-highlighter/dist/esm/languages/prism/sql'
+import tsx from 'react-syntax-highlighter/dist/esm/languages/prism/tsx'
+import typescript from 'react-syntax-highlighter/dist/esm/languages/prism/typescript'
+import type { Article, Comment } from '@shared/types'
+import { useToast } from '@shared/hooks/useToast'
+import { useThreadedComments } from '@shared/hooks/useApi'
+import { useRefreshOnWindowFocus } from '@shared/hooks/useRefreshOnWindowFocus'
+import SEO from '../components/SEO'
+import TableOfContents from '../components/TableOfContents'
+import Avatar from '@shared/components/Avatar'
+import { remarkHeadingIds } from '../lib/headings'
+import {
+  MessageSquare, ChevronLeft, Calendar, Send,
+  ChevronDown, ChevronUp, CheckCircle, AlertTriangle,
+  Share2, RefreshCw,
+} from 'lucide-react'
+
+SyntaxHighlighter.registerLanguage('bash', bash)
+SyntaxHighlighter.registerLanguage('sh', bash)
+SyntaxHighlighter.registerLanguage('shell', bash)
+SyntaxHighlighter.registerLanguage('css', css)
+SyntaxHighlighter.registerLanguage('java', java)
+SyntaxHighlighter.registerLanguage('javascript', javascript)
+SyntaxHighlighter.registerLanguage('js', javascript)
+SyntaxHighlighter.registerLanguage('json', json)
+SyntaxHighlighter.registerLanguage('jsx', jsx)
+SyntaxHighlighter.registerLanguage('markdown', markdown)
+SyntaxHighlighter.registerLanguage('md', markdown)
+SyntaxHighlighter.registerLanguage('markup', markup)
+SyntaxHighlighter.registerLanguage('html', markup)
+SyntaxHighlighter.registerLanguage('xml', markup)
+SyntaxHighlighter.registerLanguage('python', python)
+SyntaxHighlighter.registerLanguage('py', python)
+SyntaxHighlighter.registerLanguage('shell-session', shellSession)
+SyntaxHighlighter.registerLanguage('sql', sql)
+SyntaxHighlighter.registerLanguage('tsx', tsx)
+SyntaxHighlighter.registerLanguage('typescript', typescript)
+SyntaxHighlighter.registerLanguage('ts', typescript)
+
+const MIN_ARTICLE_TITLE_FONT_SIZE = 14
+
+const extractArticle = (payload: unknown): Article | null => {
+  let data = payload
+  if (
+    data
+    && typeof data === 'object'
+    && 'data' in data
+    && data.data
+    && typeof data.data === 'object'
+  ) {
+    data = data.data
+  }
+  return data && typeof data === 'object' && 'id' in data ? data as Article : null
+}
+
+const formatCommentDate = (value: string) => {
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return ''
+  return new Intl.DateTimeFormat('zh-CN', {
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(date)
+}
+
+const ArticleDetail: React.FC = () => {
+  const { id } = useParams<{ id: string }>()
+  const location = useLocation()
+  const { success, error: showError } = useToast()
+  const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains('dark'))
+  const [article, setArticle] = useState<Article | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [articleLoadError, setArticleLoadError] = useState<'not-found' | 'load-failed' | null>(null)
+  const [articleLoadAttempt, setArticleLoadAttempt] = useState(0)
+  const [guestName, setGuestName] = useState('')
+  const [commentContent, setCommentContent] = useState('')
+  const [commentSubmitting, setCommentSubmitting] = useState(false)
+  const [commentError, setCommentError] = useState('')
+  const [relatedArticles, setRelatedArticles] = useState<Article[]>([])
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const [commentsPage, setCommentsPage] = useState(0)
+  const commentSectionRef = useRef<HTMLDivElement>(null)
+  const articleTitleRef = useRef<HTMLHeadingElement>(null)
+  const focusedRefreshRequestRef = useRef(0)
+
+  const articleId = id ? Number(id) : 0
+  const requestedReturnTo = (location.state as { returnTo?: unknown } | null)?.returnTo
+  const returnTo = typeof requestedReturnTo === 'string'
+    && requestedReturnTo.startsWith('/')
+    && !requestedReturnTo.startsWith('//')
+    ? requestedReturnTo
+    : '/?tab=latest#articles'
+  const articleLinkState = { returnTo }
+
+  // Threaded comments hook
+  const {
+    data: threadedData,
+    refetch: refetchComments,
+    isLoading: commentsLoading,
+    isError: commentsLoadError,
+  } = useThreadedComments(articleId, commentsPage)
+  const threadedComments: Comment[] = threadedData?.content ?? []
+  const commentsTotalPages = threadedData?.totalPages ?? 0
+  const commentsTotalElements = threadedData?.totalElements ?? 0
+
+  useRefreshOnWindowFocus(async () => {
+    const focusedArticleId = id ? Number(id) : 0
+    if (!Number.isInteger(focusedArticleId) || focusedArticleId < 1) return
+
+    const requestId = ++focusedRefreshRequestRef.current
+    const [articleResult, relatedResult] = await Promise.allSettled([
+      axios.get(`/api/articles/${focusedArticleId}`, {
+        params: { trackView: false },
+      }),
+      axios.get(`/api/articles/${focusedArticleId}/related`),
+    ])
+    if (requestId !== focusedRefreshRequestRef.current) return
+
+    if (articleResult.status === 'fulfilled') {
+      const refreshedArticle = extractArticle(articleResult.value?.data)
+      if (refreshedArticle) {
+        setArticle(refreshedArticle)
+        setArticleLoadError(null)
+      }
+    } else if (
+      axios.isAxiosError(articleResult.reason)
+      && articleResult.reason.response?.status === 404
+    ) {
+      setArticle(null)
+      setArticleLoadError('not-found')
+    }
+
+    if (relatedResult.status === 'fulfilled') {
+      setRelatedArticles(
+        Array.isArray(relatedResult.value.data) ? relatedResult.value.data : [],
+      )
+    }
+  })
+
+  useEffect(() => () => {
+    focusedRefreshRequestRef.current += 1
+  }, [id])
+
+  useEffect(() => {
+    const root = document.documentElement
+    const syncTheme = () => setIsDark(root.classList.contains('dark'))
+    const observer = new MutationObserver(syncTheme)
+    observer.observe(root, { attributes: true, attributeFilter: ['class'] })
+    return () => observer.disconnect()
+  }, [])
+
+  useLayoutEffect(() => {
+    const title = articleTitleRef.current
+    const container = title?.parentElement
+    if (!title || !container) return
+
+    const fitTitle = () => {
+      title.style.removeProperty('font-size')
+      const availableWidth = title.clientWidth
+      const requiredWidth = title.scrollWidth
+      const baseFontSize = Number.parseFloat(window.getComputedStyle(title).fontSize)
+      if (!availableWidth || !requiredWidth || !baseFontSize || requiredWidth <= availableWidth) return
+
+      const targetWidth = Math.max(availableWidth - 1, 0)
+      let fittedFontSize = Math.max(
+        MIN_ARTICLE_TITLE_FONT_SIZE,
+        baseFontSize * targetWidth / requiredWidth,
+      )
+      for (let attempt = 0; attempt < 3; attempt += 1) {
+        title.style.fontSize = `${fittedFontSize}px`
+        const renderedWidth = title.scrollWidth
+        if (renderedWidth <= availableWidth || fittedFontSize <= MIN_ARTICLE_TITLE_FONT_SIZE) break
+        fittedFontSize = Math.max(
+          MIN_ARTICLE_TITLE_FONT_SIZE,
+          fittedFontSize * targetWidth / renderedWidth,
+        )
+      }
+    }
+
+    fitTitle()
+    let previousWidth = container.clientWidth
+    const resizeObserver = new ResizeObserver(() => {
+      const nextWidth = container.clientWidth
+      if (Math.abs(nextWidth - previousWidth) < 0.5) return
+      previousWidth = nextWidth
+      fitTitle()
+    })
+    resizeObserver.observe(container)
+    return () => resizeObserver.disconnect()
+  }, [article?.title])
+
+  useEffect(() => {
+    if (!successMessage) return
+    const t = setTimeout(() => setSuccessMessage(null), 2500)
+    const onEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setSuccessMessage(null)
+    }
+    window.addEventListener('keydown', onEscape)
+    return () => {
+      clearTimeout(t)
+      window.removeEventListener('keydown', onEscape)
+    }
+  }, [successMessage])
+
+  useEffect(() => {
+    const numId = id != null ? Number(id) : NaN
+    if (!id || Number.isNaN(numId) || numId < 1) {
+      setArticle(null)
+      setArticleLoadError('not-found')
+      setLoading(false)
+      return
+    }
+    const abortController = new AbortController()
+    setLoading(true)
+    setArticle(null)
+    setArticleLoadError(null)
+    const fetchArticle = async () => {
+      try {
+        const response = await axios.get(`/api/articles/${id}`, { signal: abortController.signal })
+        const data = extractArticle(response?.data)
+        if (!data) {
+          setArticle(null)
+          setArticleLoadError('load-failed')
+          return
+        }
+        setArticle(data)
+      } catch (err) {
+        if (!axios.isCancel(err)) {
+          setArticle(null)
+          setArticleLoadError(axios.isAxiosError(err) && err.response?.status === 404 ? 'not-found' : 'load-failed')
+        }
+      } finally {
+        if (!abortController.signal.aborted) setLoading(false)
+      }
+    }
+
+    fetchArticle()
+    return () => abortController.abort()
+  }, [id, articleLoadAttempt])
+
+  useEffect(() => {
+    if (!id || !article) return
+    const abortController = new AbortController()
+    const fetchRelated = async () => {
+      try {
+        const res = await axios.get(`/api/articles/${id}/related`, { signal: abortController.signal })
+        const list = Array.isArray(res.data) ? res.data : []
+        setRelatedArticles(list)
+      } catch (err) {
+        if (!axios.isCancel(err)) setRelatedArticles([])
+      }
+    }
+    fetchRelated()
+    return () => abortController.abort()
+  }, [id, article?.id])
+
+  const handleSubmitComment = async (e: React.FormEvent) => {
+    e.preventDefault()
+    const normalizedContent = commentContent.trim()
+    const normalizedGuestName = guestName.trim()
+    if (!normalizedContent) return
+    if (!normalizedGuestName) {
+      setCommentError('请填写昵称')
+      return
+    }
+    setCommentSubmitting(true)
+    setCommentError('')
+    try {
+      await axios.post(`/api/comments/article/${id}`, {
+        content: normalizedContent,
+        guestName: normalizedGuestName,
+      })
+      setGuestName('')
+      setCommentContent('')
+      setSuccessMessage('评论已提交，审核通过后显示')
+    } catch (err: unknown) {
+      const data = err && typeof err === 'object' && 'response' in err ? (err as { response: { data?: { message?: string; error?: string } } }).response?.data : undefined
+      setCommentError(data?.message ?? data?.error ?? '评论失败')
+    } finally {
+      setCommentSubmitting(false)
+    }
+  }
+
+  const copyToClipboard = async (text: string, successText = '代码已复制到剪贴板') => {
+    try {
+      await navigator.clipboard.writeText(text)
+      success(successText)
+    } catch {
+      const textArea = document.createElement('textarea')
+      textArea.value = text
+      document.body.appendChild(textArea)
+      textArea.select()
+      try { document.execCommand('copy'); success(successText) } catch { showError('复制失败，请手动复制') }
+      document.body.removeChild(textArea)
+    }
+  }
+
+  const scrollToComments = () => {
+    const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
+    commentSectionRef.current?.scrollIntoView({ behavior })
+    commentSectionRef.current?.focus({ preventScroll: true })
+  }
+
+  // ========== Comment rendering ==========
+  const renderComment = (comment: Comment, isReply = false) => {
+    const isGuest = !comment.ownerComment
+    const displayName = isGuest ? (comment.guestName || '访客') : '站长'
+    return (
+      <div key={comment.id} className={`${isReply ? 'ml-4 mt-3 sm:ml-10' : 'border-b border-slate-200 pb-4 dark:border-slate-700'}`}>
+        <div className="flex items-start gap-3">
+          <Avatar size="sm" fallbackName={displayName} />
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-sm font-medium text-slate-900 dark:text-slate-100">{displayName}</span>
+              {isGuest && (
+                <span className="rounded-lg bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium text-slate-500 dark:bg-slate-800 dark:text-slate-300">访客</span>
+              )}
+              <span className="text-xs text-slate-600 dark:text-slate-400">
+                {formatCommentDate(comment.createdAt)}
+              </span>
+            </div>
+            <p className="mt-1 whitespace-pre-wrap text-sm leading-7 text-slate-700 dark:text-slate-300">
+              {comment.content ?? ''}
+            </p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // ========== Loading / Not Found ==========
+  if (loading) {
+    return (
+      <div className="flex h-96 items-center justify-center" role="status" aria-busy="true">
+        <div className="flex flex-col items-center gap-2">
+          <div className="h-7 w-7 animate-spin rounded-full border-2 border-slate-300 border-t-brand-blue dark:border-slate-700 dark:border-t-blue-300" aria-hidden></div>
+          <span className="text-sm text-slate-600 dark:text-slate-400">正在加载文章…</span>
+        </div>
+      </div>
+    )
+  }
+
+  if (!article && articleLoadError === 'not-found') {
+    return (
+      <div className="flex flex-col items-center justify-center h-96 text-center">
+        <p className="mb-4 text-xl font-semibold text-slate-900 dark:text-white">文章不存在或已被删除</p>
+        <Link to="/" className="inline-flex min-h-11 items-center gap-1 rounded-xl px-2 text-brand-blue hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue">
+          <ChevronLeft className="h-4 w-4" />
+          返回首页
+        </Link>
+      </div>
+    )
+  }
+
+  if (!article) {
+    return (
+      <div className="flex h-96 flex-col items-center justify-center px-4 text-center">
+        <AlertTriangle className="h-10 w-10 text-amber-500" aria-hidden />
+        <p className="mt-4 text-xl font-semibold text-slate-900 dark:text-white">文章暂时加载失败</p>
+        <button
+          type="button"
+          onClick={() => setArticleLoadAttempt((attempt) => attempt + 1)}
+          className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-xl bg-slate-950 px-5 py-2 text-sm font-semibold text-white transition hover:bg-brand-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue dark:bg-white dark:text-slate-950 dark:hover:bg-blue-300"
+        >
+          <RefreshCw className="h-4 w-4" aria-hidden />
+          重新加载
+        </button>
+      </div>
+    )
+  }
+
+  return (
+    <>
+      {successMessage && (
+        <div className="fixed left-1/2 right-auto top-20 z-[100] flex w-[calc(100%-2rem)] max-w-xs -translate-x-1/2 items-center gap-3 rounded-2xl border border-emerald-200 bg-white/95 px-4 py-3 shadow-[0_12px_32px_-20px_rgba(15,23,42,0.45)] backdrop-blur-sm dark:border-emerald-900 dark:bg-slate-900/95" role="status" aria-live="polite">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400">
+            <CheckCircle className="h-4 w-4" />
+          </span>
+          <span className="text-sm text-slate-700 dark:text-slate-300">{successMessage}</span>
+        </div>
+      )}
+
+      {/* Mobile bottom action bar */}
+      <div className="fixed bottom-[max(0.75rem,env(safe-area-inset-bottom))] left-4 right-4 z-40 flex items-center justify-center gap-16 rounded-2xl border border-slate-200 bg-white/95 py-2 shadow-lg backdrop-blur-sm dark:border-slate-700 dark:bg-slate-900/95 lg:hidden">
+        <button type="button" onClick={scrollToComments} className="flex min-h-11 items-center gap-2 rounded-xl px-4 text-slate-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue dark:text-slate-400" aria-label="查看评论">
+          <MessageSquare className="h-5 w-5" />
+          <span className="text-xs">{commentsLoadError ? '—' : commentsTotalElements || 0}</span>
+        </button>
+        <button type="button" onClick={() => copyToClipboard(window.location.href, '链接已复制')} className="flex min-h-11 items-center gap-2 rounded-xl px-4 text-slate-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue dark:text-slate-400">
+          <Share2 className="h-5 w-5" />
+          <span className="text-xs">分享</span>
+        </button>
+      </div>
+
+      <SEO article={article} />
+      <div className="mx-auto max-w-[76rem] py-3 pb-[calc(5.5rem+env(safe-area-inset-bottom))] sm:py-4 lg:pb-8">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-8">
+          <div className="min-w-0 flex-1">
+            <article className="rounded-3xl border border-slate-300 bg-white px-5 py-6 shadow-sm dark:border-slate-700 dark:bg-slate-900 sm:px-8 sm:py-7 lg:px-12 lg:py-8">
+              <Link to={returnTo} className="-ms-6 mb-5 inline-flex min-h-11 items-center gap-1 rounded-xl px-1 text-base font-medium text-slate-500 transition hover:text-brand-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue dark:text-slate-400">
+                <ChevronLeft className="h-4 w-4" aria-hidden /> 返回文章列表
+              </Link>
+              <div className="mb-5 flex flex-col items-start gap-3 sm:flex-row sm:justify-between">
+                <div className="w-full min-w-0 flex-1 [container-type:inline-size]">
+                  <h1
+                    ref={articleTitleRef}
+                    className="display-type overflow-hidden text-ellipsis whitespace-nowrap text-3xl font-bold leading-[1.18] tracking-[-0.035em] text-slate-950 dark:text-white sm:text-[clamp(1.875rem,4.3cqi,2.7rem)]"
+                  >
+                    {article.title}
+                  </h1>
+                </div>
+              </div>
+
+              {/* Article metadata */}
+              <div className="mb-7 flex flex-wrap items-center gap-x-5 gap-y-2 border-b border-slate-200 pb-5 text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400">
+                <span className="flex items-center gap-1.5"><Calendar className="h-3.5 w-3.5" aria-hidden />{new Date(article.createdAt).toLocaleDateString()}</span>
+                {(article.category?.name || article.tags?.length) && (
+                  <div className="flex flex-wrap items-center gap-2 sm:ml-auto">
+                    {article.category?.name && <Link to={`/category/${article.category.id}`} className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg hover:text-brand-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue">{article.category.name}</Link>}
+                    {article.tags?.map((tag) => <Link key={tag.id} to={`/tag/${tag.id}`} className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg hover:text-brand-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue">#{tag.name}</Link>)}
+                  </div>
+                )}
+              </div>
+
+              <div className="mb-7 lg:hidden">
+                <TableOfContents content={article.content ?? ''} collapsible />
+              </div>
+
+              {/* Article content with heading IDs for TOC */}
+              <div className="article-prose prose prose-slate prose-headings:scroll-mt-0 prose-pre:bg-transparent prose-pre:p-0 dark:prose-invert">
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm, remarkHeadingIds]}
+                  components={{
+                    h1: ({ node, children, ...props }) => {
+                      void node
+                      return <h2 {...props}>{children}</h2>
+                    },
+                    table: ({ node, children, ...props }) => {
+                      void node
+                      return (
+                        <div className="max-w-full overflow-x-auto pb-2" tabIndex={0} role="region" aria-label="文章表格，可横向滚动">
+                          <table {...props}>{children}</table>
+                        </div>
+                      )
+                    },
+                    code({ inline, className, children, ...props }: { inline?: boolean; className?: string; children?: any; [key: string]: any }) {
+                      const match = /language-(\w+)/.exec(className || '')
+                      const codeString = String(children ?? '').replace(/\n$/, '')
+                      const lang = match?.[1] ?? 'text'
+                      return !inline && match ? (
+                        <div className="my-6 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-950">
+                          <div className="flex items-center justify-between border-b border-slate-200 px-4 py-2 font-mono text-[11px] text-slate-500 dark:border-slate-700 dark:text-slate-400">
+                            <span>{lang.toUpperCase()}</span>
+                            <button type="button" onClick={() => copyToClipboard(codeString)} className="min-h-11 rounded-xl px-2 transition-colors hover:text-brand-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue">
+                              复制代码
+                            </button>
+                          </div>
+                          <SyntaxHighlighter {...props} style={isDark ? oneDark : oneLight} language={lang} PreTag="div" customStyle={{ margin: 0, padding: '1.5rem', fontSize: '0.9rem', lineHeight: '1.65', backgroundColor: 'transparent' }}>
+                            {codeString}
+                          </SyntaxHighlighter>
+                        </div>
+                      ) : (
+                        <code {...props} className="px-1.5 py-0.5 font-mono text-sm">{children}</code>
+                      )
+                    }
+                  }}
+                >
+                  {article.content ?? ''}
+                </ReactMarkdown>
+              </div>
+
+              <div className="mt-9 hidden items-center gap-8 border-t border-slate-200 pt-5 text-sm dark:border-slate-700 lg:flex">
+                <button type="button" onClick={scrollToComments} className="flex min-h-11 items-center gap-2 rounded-xl text-slate-500 transition-colors hover:text-brand-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue dark:text-slate-400">
+                  <MessageSquare className="h-4 w-4" aria-hidden />
+                  <span>{commentsTotalElements} 条评论</span>
+                </button>
+                <button type="button" onClick={() => copyToClipboard(window.location.href, '链接已复制')} className="flex min-h-11 items-center gap-2 rounded-xl text-slate-500 transition-colors hover:text-brand-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue dark:text-slate-400">
+                  <Share2 className="h-4 w-4" aria-hidden />
+                  <span>复制链接</span>
+                </button>
+              </div>
+            </article>
+
+            {/* ========== Comment Section ========== */}
+            <section ref={commentSectionRef} tabIndex={-1} aria-labelledby="comments-title" className="mt-4 rounded-3xl border border-slate-300 bg-white px-5 py-6 shadow-sm dark:border-slate-700 dark:bg-slate-900 sm:px-8 lg:px-10">
+              <div className="mb-5">
+                <h2 id="comments-title" className="text-xl font-bold text-slate-950 dark:text-white">评论 <span className="font-normal text-slate-500 dark:text-slate-400">{commentsTotalElements}</span></h2>
+              </div>
+
+              {/* Comment form */}
+              <form onSubmit={handleSubmitComment} className="mb-6 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-950/40">
+                <div className="border-b border-slate-200 px-4 py-4 dark:border-slate-700 sm:px-5">
+                    <label htmlFor="comment-guest-name" className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-200">你的昵称</label>
+                    <input
+                      id="comment-guest-name"
+                      required
+                      value={guestName}
+                      onChange={(e) => {
+                        setGuestName(e.target.value)
+                        setCommentError('')
+                      }}
+                      maxLength={30}
+                      autoComplete="name"
+                      aria-invalid={commentError === '请填写昵称'}
+                      aria-describedby={commentError === '请填写昵称' ? 'comment-error' : undefined}
+                      className="control-field h-11 w-full rounded-xl border border-slate-300 bg-white px-3.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-500 focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/15 dark:border-slate-600 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-400 dark:focus:border-blue-400 dark:focus:ring-blue-400/20"
+                    />
+                </div>
+                <div className="px-4 py-4 sm:px-5">
+                  <label htmlFor="comment-content" className="sr-only">评论内容</label>
+                <textarea
+                  id="comment-content"
+                  required
+                  value={commentContent}
+                  onChange={(e) => {
+                    setCommentContent(e.target.value)
+                    setCommentError('')
+                  }}
+                  maxLength={1000}
+                  placeholder="评论内容"
+                  rows={4}
+                  aria-invalid={!!commentError && commentError !== '请填写昵称'}
+                  aria-describedby={commentError && commentError !== '请填写昵称' ? 'comment-error' : undefined}
+                  className="control-field w-full resize-y rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm leading-6 text-slate-900 outline-none transition placeholder:text-slate-500 focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/15 dark:border-slate-600 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-400 dark:focus:border-blue-400 dark:focus:ring-blue-400/20"
+                />
+                {commentError && <p id="comment-error" className="mt-2 text-sm text-red-600 dark:text-red-400" role="alert">{commentError}</p>}
+                <div className="mt-3 flex justify-end">
+                  <button
+                    type="submit"
+                    disabled={!guestName.trim() || !commentContent.trim() || commentSubmitting}
+                    className="flex min-h-11 shrink-0 items-center justify-center gap-1.5 rounded-xl bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-white dark:text-slate-950 dark:hover:bg-blue-300 dark:focus-visible:ring-offset-slate-900"
+                  >
+                    <Send className="h-4 w-4" />
+                    {commentSubmitting ? '提交中…' : '提交审核'}
+                  </button>
+                </div>
+                </div>
+              </form>
+
+              {/* Threaded comment list */}
+              {commentsLoading ? (
+                <div className="flex items-center justify-center gap-2 py-8 text-sm text-slate-500 dark:text-slate-400" role="status">
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-brand-blue border-t-transparent" aria-hidden />
+                  正在加载评论…
+                </div>
+              ) : commentsLoadError ? (
+                <div className="flex flex-col items-center justify-center py-8 text-center">
+                  <AlertTriangle className="h-8 w-8 text-amber-500" aria-hidden />
+                  <p className="mt-3 text-sm font-medium text-slate-700 dark:text-slate-200">评论暂时加载失败</p>
+                  <button
+                    type="button"
+                    onClick={() => refetchComments()}
+                    className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-xl border border-slate-300 px-4 py-2 text-sm font-semibold text-brand-blue transition hover:bg-blue-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue dark:border-slate-600 dark:hover:bg-blue-500/10"
+                  >
+                    <RefreshCw className="h-4 w-4" aria-hidden />
+                    重新加载评论
+                  </button>
+                </div>
+              ) : threadedComments.length > 0 ? (
+                <div className="space-y-5">
+                  {threadedComments.map((comment) => (
+                    <div key={comment.id}>
+                      {renderComment(comment)}
+                      {/* Replies */}
+                      {comment.replies && comment.replies.length > 0 && (
+                        <div className="space-y-0">
+                          {comment.replies.slice(0, 3).map((reply) => renderComment(reply, true))}
+                          {comment.replies.length > 3 && (
+                            <ReplyExpander replies={comment.replies.slice(3)} renderComment={renderComment} />
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+
+                  {/* Pagination */}
+                  {commentsTotalPages > 1 && (
+                    <div className="flex items-center justify-center gap-4 pt-4">
+                      <button type="button" onClick={() => setCommentsPage(p => p - 1)} disabled={commentsPage === 0} className="flex min-h-11 items-center gap-1 rounded-xl border border-slate-300 px-3 py-1.5 text-sm text-slate-700 hover:border-brand-blue hover:text-brand-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-600 dark:text-slate-300">
+                        <ChevronUp className="h-4 w-4" /> 上一页
+                      </button>
+                      <span className="text-sm text-slate-500 dark:text-slate-400">{commentsPage + 1} / {commentsTotalPages}</span>
+                      <button type="button" onClick={() => setCommentsPage(p => p + 1)} disabled={commentsPage >= commentsTotalPages - 1} className="flex min-h-11 items-center gap-1 rounded-xl border border-slate-300 px-3 py-1.5 text-sm text-slate-700 hover:border-brand-blue hover:text-brand-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-600 dark:text-slate-300">
+                        下一页 <ChevronDown className="h-4 w-4" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="py-8 text-center text-slate-500 dark:text-slate-400">还没有评论</div>
+              )}
+            </section>
+          </div>
+
+          {/* ========== Sidebar ========== */}
+          <aside className="sticky top-4 hidden max-h-[calc(100vh-2rem)] w-72 shrink-0 self-start space-y-7 overflow-y-auto pr-1 lg:block">
+            {/* Dynamic Table of Contents */}
+            <TableOfContents content={article.content ?? ''} />
+
+            {/* Related articles */}
+            {relatedArticles.length > 0 && (
+              <section className="border-t border-slate-400 pt-4 dark:border-slate-600">
+                <h2 className="mb-4 text-sm font-bold text-slate-950 dark:text-white">继续阅读</h2>
+                <div className="divide-y divide-slate-200 dark:divide-slate-700">
+                  {relatedArticles.map((related) => (
+                    <Link key={related.id} to={`/article/${related.id}`} state={articleLinkState} className="group block py-3 first:pt-0">
+                      <p className="line-clamp-2 text-sm font-medium leading-6 text-slate-700 transition-colors group-hover:text-brand-blue dark:text-slate-300">{related.title}</p>
+                      <div className="mt-1.5 flex items-center gap-2 text-xs text-slate-600 dark:text-slate-400">
+                        <span>{new Date(related.createdAt).toLocaleDateString()}</span>
+                        <span>·</span>
+                        <span>{related.views ?? 0} 阅读</span>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            )}
+          </aside>
+        </div>
+      </div>
+    </>
+  )
+}
+
+// Sub-component: expandable replies (> 3)
+const ReplyExpander: React.FC<{
+  replies: Comment[]
+  renderComment: (c: Comment, isReply: boolean) => React.ReactNode
+}> = ({ replies, renderComment }) => {
+  const [expanded, setExpanded] = useState(false)
+
+  if (!expanded) {
+    return (
+      <button
+        type="button"
+        onClick={() => setExpanded(true)}
+        className="ml-4 mt-2 flex min-h-11 items-center gap-1 rounded-xl px-1 text-xs text-brand-blue hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue sm:ml-10"
+      >
+        <ChevronDown className="h-3.5 w-3.5" />
+        展开其余 {replies.length} 条回复
+      </button>
+    )
+  }
+
+  return (
+    <>
+      {replies.map((reply) => renderComment(reply, true))}
+      <button
+        type="button"
+        onClick={() => setExpanded(false)}
+        className="ml-4 mt-2 flex min-h-11 items-center gap-1 rounded-xl px-1 text-xs text-brand-blue hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue sm:ml-10"
+      >
+        <ChevronUp className="h-3.5 w-3.5" />
+        收起回复
+      </button>
+    </>
+  )
+}
+
+export default ArticleDetail

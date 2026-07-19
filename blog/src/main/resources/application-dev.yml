@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/blog_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true}
+    driverClassName: com.mysql.cj.jdbc.Driver
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:}
+jwt:
+  # For development only. Generate with: openssl rand -base64 64
+  secret: ${JWT_SECRET:ZGV2LXNlY3JldC1rZXktZm9yLWRldmVsb3BtZW50LW9ubHktZ2VuZXJhdGUtbmV3LWZvci1wcm9kdWN0aW9uLXVzZS1vcGVuc3NsLXJhbmQtYmFzZTY0LTY0LWJ5dGVzLW1pbmltdW0=}
+  # The above is Base64-encoded "dev-secret-key-for-development-only-generate-new-for-production-use-openssl-rand-base64-64-bytes-minimum"
+  # IMPORTANT: Change this for production! Use: openssl rand -base64 64
+
+# Development CORS - localhost only
+cors:
+  allowed-origin-patterns: http://localhost:5173,http://localhost:5174,http://127.0.0.1:5173,http://127.0.0.1:5174

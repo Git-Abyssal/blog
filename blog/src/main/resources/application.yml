@@ -1,0 +1,116 @@
+server:
+  port: 8080
+  compression:
+    enabled: true
+    mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json,application/xml
+    min-response-size: 1024
+
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml
+  type-aliases-package: com.example.blog.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+  global-config:
+    db-config:
+      id-type: auto
+
+spring:
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev} # 默认 dev 环境
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  datasource:
+    # HikariCP 连接池配置
+    hikari:
+      # 连接池大小
+      maximum-pool-size: ${DB_POOL_MAX_SIZE:10}
+      minimum-idle: ${DB_POOL_MIN_IDLE:2}
+      # 连接超时设置
+      connection-timeout: 30000      # 30秒
+      idle-timeout: 600000           # 10分钟
+      max-lifetime: 1800000          # 30分钟
+      # 连接测试
+      connection-test-query: SELECT 1
+      validation-timeout: 3000       # 3秒
+      # 性能优化
+      auto-commit: true
+      pool-name: BlogHikariCP
+      # 泄漏检测
+      leak-detection-threshold: 60000  # 60秒（仅用于开发调试）
+  flyway:
+    locations: classpath:db/migration
+  data:
+    web:
+      pageable:
+        max-page-size: 100  # 防止 ?size= 过大导致重查询
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+
+logging:
+  file:
+    name: logs/blog.log
+  pattern:
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  level:
+    org.springframework.security: INFO
+  logback:
+    rollingpolicy:
+      max-file-size: 10MB
+      max-history: 30
+      total-size-cap: 1GB
+      file-name-pattern: "logs/blog-%d{yyyy-MM-dd}.%i.log"
+
+jwt:
+  expiration: 86400000 # 24 hours
+
+blog:
+  owner-username: ${BLOG_OWNER_USERNAME:admin}
+  site-title: ${BLOG_SITE_TITLE:Abyssal的分享}
+  author-name: ${BLOG_AUTHOR_NAME:Abyssal}
+
+# Uploaded images are stored outside the application image on a dedicated volume.
+storage:
+  root: ${STORAGE_ROOT:./uploads}
+  bucket-name: ${STORAGE_BUCKET:blog-images}
+  public-url: ${STORAGE_PUBLIC_URL:/storage}
+
+# CORS Configuration
+# Development: localhost only (override in application-dev.yml if needed)
+# Production: Set via CORS_ORIGIN_PATTERNS environment variable
+# Security: Never use wildcard "*" in production
+cors:
+  allowed-origin-patterns: ${CORS_ORIGIN_PATTERNS:http://localhost:5173,http://localhost:5174}
+
+# Cookie Security Configuration
+# Production must use secure=true and SameSite=Strict
+app:
+  base-url: ${APP_BASE_URL:http://localhost:5173}
+  cookie:
+    secure: ${APP_COOKIE_SECURE:false}  # true for production (HTTPS)
+    same-site: ${APP_COOKIE_SAME_SITE:Lax}  # Lax for dev, Strict for prod
+
+# Security Thresholds Configuration
+# These values can be adjusted without code changes
+security:
+  authentication:
+    password-history-size: ${SECURITY_PASSWORD_HISTORY_SIZE:5}  # Number of previous passwords to remember
+  rate-limit:
+    # Owner login endpoint
+    auth-requests-per-minute: ${SECURITY_RATE_LIMIT_AUTH:10}     # Login attempts per minute
+    # Owner password changes
+    password-change-per-5min: ${SECURITY_RATE_LIMIT_PASSWORD_CHANGE:3}  # Password change per 5 min
+    # Content creation
+    article-requests-per-minute: ${SECURITY_RATE_LIMIT_ARTICLE:3}  # Article creation per minute
+    comment-requests-per-minute: ${SECURITY_RATE_LIMIT_COMMENT:10} # Comment creation per minute
+    upload-requests-per-minute: ${SECURITY_RATE_LIMIT_UPLOAD:5}    # File uploads per minute
+    # Owner operations
+    owner-operations-per-minute: ${SECURITY_RATE_LIMIT_OWNER:20}      # Owner operations per minute
+  # Trusted proxy IPs for rate limiting (only trust X-Forwarded-For from these)
+  # Comma-separated list of IPs. Default: localhost only for security
+  trusted-proxies: ${SECURITY_TRUSTED_PROXIES:127.0.0.1,::1}

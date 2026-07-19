@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.blog.mapper.ArticleMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.blog.entity.Article">
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="summary" property="summary"/>
+        <result column="cover_image" property="coverImage"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="views" property="views"/>
+        <result column="status" property="status"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+        <result column="comment_count" property="commentCount"/>
+    </resultMap>
+
+    <resultMap id="ListResultMap" type="com.example.blog.entity.Article">
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="summary" property="summary"/>
+        <result column="cover_image" property="coverImage"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="views" property="views"/>
+        <result column="status" property="status"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+        <result column="comment_count" property="commentCount"/>
+    </resultMap>
+
+    <select id="selectAllWithDetails" resultMap="ListResultMap">
+        SELECT a.id, a.title, a.summary, a.cover_image, a.category_id, a.views, a.status, a.created_at, a.updated_at,
+               COALESCE(cc.cnt, 0) AS comment_count
+        FROM articles a
+        LEFT JOIN (SELECT article_id, COUNT(*) AS cnt FROM comments WHERE status = 'approved' GROUP BY article_id) cc ON cc.article_id = a.id
+        WHERE a.status = 'published'
+        ORDER BY a.created_at DESC
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="countAll" resultType="long">
+        SELECT COUNT(*) FROM articles WHERE status = 'published'
+    </select>
+
+    <select id="selectLatestForRss" resultMap="BaseResultMap">
+        SELECT id, title, content, summary, cover_image, category_id,
+               views, status, created_at, updated_at
+        FROM articles
+        WHERE status = 'published'
+        ORDER BY created_at DESC
+        LIMIT #{limit}
+    </select>
+
+    <select id="selectLatestForSitemap" resultMap="BaseResultMap">
+        SELECT id, created_at, updated_at
+        FROM articles
+        WHERE status = 'published'
+        ORDER BY created_at DESC
+        LIMIT #{limit}
+    </select>
+
+    <select id="searchArticles" resultMap="ListResultMap">
+        SELECT a.id, a.title, a.summary, a.cover_image, a.category_id, a.views, a.status, a.created_at, a.updated_at,
+               COALESCE(cc.cnt, 0) AS comment_count
+        FROM articles a
+        LEFT JOIN (SELECT article_id, COUNT(*) AS cnt FROM comments WHERE status = 'approved' GROUP BY article_id) cc ON cc.article_id = a.id
+        WHERE a.status = 'published'
+          AND (LOWER(a.title) LIKE LOWER(CONCAT('%', #{keyword}, '%')) ESCAPE '/'
+           OR LOWER(a.content) LIKE LOWER(CONCAT('%', #{keyword}, '%')) ESCAPE '/')
+        ORDER BY a.created_at DESC
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="countSearch" resultType="long">
+        SELECT COUNT(*) FROM articles
+        WHERE status = 'published'
+          AND (LOWER(title) LIKE LOWER(CONCAT('%', #{keyword}, '%')) ESCAPE '/'
+           OR LOWER(content) LIKE LOWER(CONCAT('%', #{keyword}, '%')) ESCAPE '/')
+    </select>
+
+    <select id="selectWithDetailsById" resultMap="BaseResultMap">
+        SELECT id, title, content, summary, cover_image, category_id, views, status, created_at, updated_at
+        FROM articles WHERE id = #{id}
+    </select>
+
+    <select id="selectRelatedArticles" resultMap="ListResultMap">
+        SELECT DISTINCT a.id, a.title, a.summary, a.cover_image, a.category_id, a.views, a.status, a.created_at, a.updated_at
+        FROM articles a
+        LEFT JOIN article_tags at2 ON a.id = at2.article_id AND at2.tag_id IN (SELECT tag_id FROM article_tags WHERE article_id = #{articleId})
+        WHERE a.status = 'published' AND (a.category_id = #{categoryId} OR at2.tag_id IS NOT NULL) AND a.id != #{articleId}
+        ORDER BY a.created_at DESC
+        LIMIT 10
+    </select>
+
+    <!-- 管理后台：获取草稿和已发布文章，支持组合筛选 -->
+    <select id="selectAllForAdmin" resultMap="ListResultMap">
+        SELECT a.id, a.title, a.summary, a.cover_image, a.category_id,
+               a.views, a.status, a.created_at, a.updated_at
+        FROM articles a
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (LOWER(a.title) LIKE LOWER(CONCAT('%', #{keyword}, '%')) ESCAPE '/'
+                  OR LOWER(a.content) LIKE LOWER(CONCAT('%', #{keyword}, '%')) ESCAPE '/')
+            </if>
+            <if test="status != null and status != ''">
+                AND a.status = #{status}
+            </if>
+            <if test="categoryId != null">
+                AND a.category_id = #{categoryId}
+            </if>
+            <if test="tagId != null">
+                AND EXISTS (
+                    SELECT 1
+                    FROM article_tags filter_at
+                    WHERE filter_at.article_id = a.id
+                      AND filter_at.tag_id = #{tagId}
+                )
+            </if>
+        </where>
+        ORDER BY a.created_at DESC
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="countAllForAdmin" resultType="long">
+        SELECT COUNT(*) FROM articles a
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (LOWER(a.title) LIKE LOWER(CONCAT('%', #{keyword}, '%')) ESCAPE '/'
+                  OR LOWER(a.content) LIKE LOWER(CONCAT('%', #{keyword}, '%')) ESCAPE '/')
+            </if>
+            <if test="status != null and status != ''">
+                AND a.status = #{status}
+            </if>
+            <if test="categoryId != null">
+                AND a.category_id = #{categoryId}
+            </if>
+            <if test="tagId != null">
+                AND EXISTS (
+                    SELECT 1
+                    FROM article_tags filter_at
+                    WHERE filter_at.article_id = a.id
+                      AND filter_at.tag_id = #{tagId}
+                )
+            </if>
+        </where>
+    </select>
+
+    <!-- By Category -->
+    <select id="selectByCategoryId" resultMap="ListResultMap">
+        SELECT a.id, a.title, a.summary, a.cover_image, a.category_id, a.views, a.status, a.created_at, a.updated_at,
+               COALESCE(cc.cnt, 0) AS comment_count
+        FROM articles a
+        LEFT JOIN (SELECT article_id, COUNT(*) AS cnt FROM comments WHERE status = 'approved' GROUP BY article_id) cc ON cc.article_id = a.id
+        WHERE a.category_id = #{categoryId} AND a.status = 'published'
+        ORDER BY a.created_at DESC
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="countByCategoryId" resultType="long">
+        SELECT COUNT(*) FROM articles WHERE category_id = #{categoryId} AND status = 'published'
+    </select>
+
+    <!-- By Tag -->
+    <select id="selectByTagId" resultMap="ListResultMap">
+        SELECT DISTINCT a.id, a.title, a.summary, a.cover_image, a.category_id, a.views, a.status, a.created_at, a.updated_at,
+               COALESCE(cc.cnt, 0) AS comment_count
+        FROM articles a
+        JOIN article_tags at2 ON a.id = at2.article_id
+        LEFT JOIN (SELECT article_id, COUNT(*) AS cnt FROM comments WHERE status = 'approved' GROUP BY article_id) cc ON cc.article_id = a.id
+        WHERE at2.tag_id = #{tagId} AND a.status = 'published'
+        ORDER BY a.created_at DESC
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="countByTagId" resultType="long">
+        SELECT COUNT(DISTINCT a.id) FROM articles a
+        JOIN article_tags at2 ON a.id = at2.article_id
+        WHERE at2.tag_id = #{tagId} AND a.status = 'published'
+    </select>
+
+    <!-- Hot articles (last 7 days, scored by views and approved comments) -->
+    <select id="selectHotArticles" resultMap="ListResultMap">
+        SELECT a.id, a.title, a.summary, a.cover_image, a.category_id, a.views, a.status, a.created_at, a.updated_at,
+               COALESCE(cc.cnt, 0) AS comment_count
+        FROM articles a
+        LEFT JOIN (SELECT article_id, COUNT(*) AS cnt FROM comments WHERE status = 'approved' GROUP BY article_id) cc ON cc.article_id = a.id
+        WHERE a.status = 'published' AND a.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+        ORDER BY (a.views + COALESCE(cc.cnt, 0) * 20) DESC
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="countHotArticles" resultType="long">
+        SELECT COUNT(*) FROM articles WHERE status = 'published' AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+    </select>
+</mapper>

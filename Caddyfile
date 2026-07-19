@@ -1,0 +1,20 @@
+{
+	admin off
+	default_sni {$SITE_ADDRESS}
+}
+
+{$SITE_ADDRESS} {
+	tls {
+		issuer acme {
+			profile shortlived
+		}
+	}
+
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		-Server
+	}
+
+	encode zstd gzip
+	reverse_proxy frontend:8080
+}

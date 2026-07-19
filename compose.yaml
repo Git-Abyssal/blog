@@ -1,0 +1,188 @@
+services:
+  # MySQL 数据库
+  mysql:
+    build: ./mysql
+    container_name: blog-mysql
+    restart: always
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    mem_limit: 1024m
+    pids_limit: 256
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?DB_ROOT_PASSWORD is required}
+      MYSQL_DATABASE: blog_db
+      MYSQL_USER: ${DB_USERNAME:-blog_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p$$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  # Redis 缓存
+  redis:
+    image: redis:7.4-alpine@sha256:6ab0b6e7381779332f97b8ca76193e45b0756f38d4c0dcda72dbb3c32061ab99
+    container_name: blog-redis
+    restart: always
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 256m
+    pids_limit: 128
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?REDIS_PASSWORD is required}
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:?REDIS_PASSWORD is required}
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a \"$${REDIS_PASSWORD}\" ping | grep PONG"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # 博客后端
+  blog:
+    build: ./blog
+    container_name: blog-backend
+    restart: always
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+    mem_limit: 1280m
+    pids_limit: 256
+    environment:
+      # 数据库配置
+      SPRING_PROFILES_ACTIVE: prod
+      # 生产环境必须使用 SSL；若 MySQL 未配置 SSL 导致连接失败，可临时改为 useSSL=false
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/blog_db?useSSL=true&serverTimezone=UTC&allowPublicKeyRetrieval=false
+      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME:-blog_user}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+
+      # Redis配置
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?REDIS_PASSWORD is required}
+
+      # JWT：生产必须设置，无默认值。生成：openssl rand -base64 64
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
+      BLOG_OWNER_INITIAL_PASSWORD: ${BLOG_OWNER_INITIAL_PASSWORD:?BLOG_OWNER_INITIAL_PASSWORD is required}
+      BLOG_OWNER_USERNAME: ${BLOG_OWNER_USERNAME:-admin}
+      BLOG_SITE_TITLE: ${BLOG_SITE_TITLE:-Abyssal的分享}
+      BLOG_AUTHOR_NAME: ${BLOG_AUTHOR_NAME:-Abyssal}
+      APP_BASE_URL: ${APP_BASE_URL:?APP_BASE_URL is required}
+
+      # 上传文件存储在独立 Docker volume 中。
+      STORAGE_ROOT: /app/uploads
+      STORAGE_BUCKET: ${STORAGE_BUCKET:-blog-images}
+      STORAGE_PUBLIC_URL: ${STORAGE_PUBLIC_URL:-/storage}
+
+      # 安全配置（生产环境）
+      APP_COOKIE_SECURE: ${COOKIE_SECURE:-true}
+      APP_COOKIE_SAME_SITE: ${COOKIE_SAME_SITE:-Strict}
+      CORS_ORIGIN_PATTERNS: ${CORS_ORIGIN_PATTERNS:?CORS_ORIGIN_PATTERNS is required}
+      SECURITY_TRUSTED_PROXIES: ${SECURITY_TRUSTED_PROXIES:-127.0.0.1,::1,172.16.0.0/12}
+
+      # JVM memory limit; adjust together with the container memory limit.
+      JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS:--Xms256m -Xmx1024m}
+      DB_POOL_MAX_SIZE: ${DB_POOL_MAX_SIZE:-10}
+      DB_POOL_MIN_IDLE: ${DB_POOL_MIN_IDLE:-2}
+
+      # 安全阈值配置
+      SECURITY_PASSWORD_HISTORY_SIZE: 5
+      SECURITY_RATE_LIMIT_AUTH: 10
+      SECURITY_RATE_LIMIT_PASSWORD_CHANGE: 3
+
+    expose:
+      - "8080"
+    volumes:
+      - blog-logs:/app/logs
+      - uploads:/app/uploads
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    build:
+      context: ./blog-web
+      args:
+        BLOG_SITE_TITLE: ${BLOG_SITE_TITLE:-Abyssal的分享}
+        BLOG_AUTHOR_NAME: ${BLOG_AUTHOR_NAME:-Abyssal}
+        BLOG_SITE_DESCRIPTION: ${BLOG_SITE_DESCRIPTION:-一个面向个人写作的单作者博客}
+    container_name: blog-frontend
+    restart: always
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: true
+    tmpfs:
+      - /var/cache/nginx:size=32m
+      - /var/run:size=1m
+      - /tmp:size=16m,mode=1777
+    mem_limit: 128m
+    pids_limit: 64
+    depends_on:
+      - blog
+    expose:
+      - "8080"
+    volumes:
+      - uploads:/srv/storage:ro
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:8080/"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  # Public TLS edge. Let’s Encrypt issues a short-lived certificate directly
+  # for the server IP and Caddy renews it automatically.
+  caddy:
+    build: ./caddy
+    container_name: blog-caddy
+    restart: always
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m,mode=1777
+    mem_limit: 128m
+    pids_limit: 64
+    depends_on:
+      frontend:
+        condition: service_healthy
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:?SITE_ADDRESS is required}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+
+volumes:
+  mysql-data:
+  redis-data:
+  blog-logs:
+  uploads:
+  caddy-data:
+  caddy-config:

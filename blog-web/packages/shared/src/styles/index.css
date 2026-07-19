@@ -1,0 +1,195 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  --page-bg: #f3f6fa;
+  --ink: #101828;
+  --control-line: #8793a5;
+  --accent: #3157e1;
+}
+
+.dark {
+  color-scheme: dark;
+  --page-bg: #0b111b;
+  --ink: #f5f7fb;
+  --control-line: #64748b;
+  --accent: #89a4ff;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
+  background: var(--page-bg);
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background: var(--page-bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 160ms ease, color 160ms ease;
+  overflow-wrap: break-word;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+.control-field:not(:focus):not([aria-invalid="true"]) {
+  border-color: var(--control-line);
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+::selection {
+  background: rgba(36, 84, 214, 0.18);
+  color: var(--ink);
+}
+
+:focus-visible {
+  outline-style: solid;
+  outline-width: 2px;
+  outline-color: var(--accent);
+  outline-offset: 3px;
+}
+
+.category-scroll {
+  scrollbar-width: none;
+}
+
+.category-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.page-bg-pattern {
+  background: var(--page-bg);
+}
+
+.display-type {
+  font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, "PingFang SC", "Noto Sans SC", sans-serif;
+}
+
+.utility-type {
+  font-family: "SFMono-Regular", "Cascadia Code", "Roboto Mono", ui-monospace, monospace;
+}
+
+.article-prose {
+  max-width: 72ch;
+  color: #344054;
+  font-size: 1.0625rem;
+  line-height: 1.88;
+}
+
+.article-prose > :first-child {
+  margin-top: 0;
+}
+
+.article-prose :where(h1, h2, h3) {
+  color: #101828;
+  letter-spacing: -0.025em;
+  font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, "PingFang SC", "Noto Sans SC", sans-serif;
+}
+
+.article-prose :where(h2) {
+  margin-top: 2em;
+  margin-bottom: 0.65em;
+  padding-top: 0.2em;
+}
+
+.article-prose :where(a) {
+  color: var(--accent);
+  text-decoration-color: color-mix(in srgb, var(--accent) 45%, transparent);
+  text-underline-offset: 0.2em;
+}
+
+.article-prose :where(blockquote) {
+  border-left-color: var(--accent);
+  color: #475467;
+  font-style: normal;
+  background: #f7f9fc;
+  border-radius: 0 0.85rem 0.85rem 0;
+  padding-bottom: 0.8rem;
+  padding-top: 0.8rem;
+}
+
+.prose blockquote p:first-of-type::before,
+.prose blockquote p:last-of-type::after {
+  content: none;
+}
+
+.article-prose :where(code):not(:where(pre *)) {
+  border-radius: 0.55rem;
+  background: #eef2f7;
+  color: #1d4ed8;
+  font-size: 0.88em;
+  font-weight: 600;
+}
+
+.dark .article-prose {
+  color: #c4ccd8;
+}
+
+.dark .article-prose :where(h1, h2, h3, strong) {
+  color: #f3f6fb;
+}
+
+.dark .article-prose :where(blockquote) {
+  color: #aab5c4;
+  background: #151f2e;
+}
+
+.dark .article-prose :where(code):not(:where(pre *)) {
+  background: #1c2736;
+  color: #a9c2ff;
+}
+
+/* Browser autofill should remain visually consistent with the flat fields. */
+.login-input:-webkit-autofill,
+.login-input:-webkit-autofill:hover,
+.login-input:-webkit-autofill:focus,
+.login-input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset;
+  box-shadow: 0 0 0 1000px #ffffff inset;
+  -webkit-text-fill-color: #111827;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+.dark .login-input:-webkit-autofill,
+.dark .login-input:-webkit-autofill:hover,
+.dark .login-input:-webkit-autofill:focus,
+.dark .login-input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #1e293b inset;
+  box-shadow: 0 0 0 1000px #1e293b inset;
+  -webkit-text-fill-color: #ffffff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
