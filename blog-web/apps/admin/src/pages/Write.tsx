@@ -928,7 +928,7 @@ const Write: React.FC = () => {
             ref={contentRef}
             aria-label="文章正文"
             placeholder="输入正文（支持 Markdown 富文本）…"
-            className="w-full flex-1 resize-none bg-white p-5 font-mono text-[14px] leading-7 text-slate-900 outline-none placeholder:text-slate-500 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-blue dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-400"
+            className="w-full flex-1 resize-none rounded-b-2xl bg-white p-5 font-mono text-[14px] leading-7 text-slate-900 outline-none placeholder:text-slate-500 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-blue md:rounded-bl-2xl md:rounded-br-none dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-400"
             value={content}
             onChange={(e) => {
               setContent(e.target.value);

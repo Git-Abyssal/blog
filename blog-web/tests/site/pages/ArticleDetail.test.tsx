@@ -265,6 +265,11 @@ describe('ArticleDetail comments', () => {
     await screen.findByRole('heading', { name: '一篇工程记录' })
     const expandButton = screen.getByRole('button', { name: '展开文章操作' })
     expect(expandButton.parentElement).toHaveClass('bottom-[calc(4.5rem+env(safe-area-inset-bottom))]')
+    expect(expandButton.parentElement).toHaveClass(
+      'right-[calc(0.75rem+env(safe-area-inset-right))]',
+      'rounded-full',
+    )
+    expect(expandButton).not.toHaveClass('border-l')
     expect(expandButton).toHaveAttribute('aria-expanded', 'false')
     expect(document.getElementById('mobile-article-actions')).not.toBeInTheDocument()
 
@@ -272,7 +277,9 @@ describe('ArticleDetail comments', () => {
 
     const actionMenu = document.getElementById('mobile-article-actions')
     expect(actionMenu).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: '收起文章操作' })).toHaveAttribute('aria-expanded', 'true')
+    const collapseButton = screen.getByRole('button', { name: '收起文章操作' })
+    expect(collapseButton).toHaveAttribute('aria-expanded', 'true')
+    expect(collapseButton).toHaveClass('border-l', 'border-slate-200')
     expect(within(actionMenu as HTMLElement).getByRole('button', { name: '查看评论' })).toBeInTheDocument()
     expect(within(actionMenu as HTMLElement).getByRole('button', { name: '复制文章链接' })).toBeInTheDocument()
 

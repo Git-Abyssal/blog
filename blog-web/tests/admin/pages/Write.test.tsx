@@ -148,10 +148,11 @@ describe('Write', () => {
 
   it('offers an edit and preview switch for narrow screens', async () => {
     renderWrite()
-    await screen.findByLabelText('文章正文')
+    const textarea = await screen.findByLabelText('文章正文')
 
     const editButton = screen.getByRole('button', { name: '编辑' })
     const previewButton = screen.getByRole('button', { name: '预览' })
+    expect(textarea).toHaveClass('rounded-b-2xl', 'md:rounded-bl-2xl', 'md:rounded-br-none')
     expect(screen.getByRole('button', { name: '插入图片' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: '代码块' })).toBeInTheDocument()
     expect(editButton).toHaveAttribute('aria-pressed', 'true')
