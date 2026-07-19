@@ -357,7 +357,7 @@ const ArticleDetail: React.FC = () => {
       )}
 
       {/* Mobile collapsible action rail */}
-      <div className="fixed bottom-[calc(6rem+env(safe-area-inset-bottom))] right-[env(safe-area-inset-right)] z-40 flex min-h-12 overflow-hidden rounded-l-2xl border border-r-0 border-slate-200 bg-white/95 shadow-lg backdrop-blur-sm dark:border-slate-700 dark:bg-slate-900/95 lg:hidden">
+      <div className="fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom))] right-[env(safe-area-inset-right)] z-40 flex min-h-12 overflow-hidden rounded-l-2xl border border-r-0 border-slate-200 bg-white/95 shadow-lg backdrop-blur-sm dark:border-slate-700 dark:bg-slate-900/95 lg:hidden">
         {mobileActionsOpen && (
           <div id="mobile-article-actions" className="flex items-stretch" aria-label="文章快捷操作">
             <button type="button" onClick={scrollToComments} className="flex min-h-12 items-center gap-2 px-3 text-slate-500 transition hover:text-brand-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-blue dark:text-slate-400" aria-label="查看评论">

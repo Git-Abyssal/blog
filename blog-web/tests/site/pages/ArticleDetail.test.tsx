@@ -181,6 +181,7 @@ describe('ArticleDetail comments', () => {
 
     await screen.findByRole('heading', { name: '一篇工程记录' })
     const expandButton = screen.getByRole('button', { name: '展开文章操作' })
+    expect(expandButton.parentElement).toHaveClass('bottom-[calc(4.5rem+env(safe-area-inset-bottom))]')
     expect(expandButton).toHaveAttribute('aria-expanded', 'false')
     expect(document.getElementById('mobile-article-actions')).not.toBeInTheDocument()
 
