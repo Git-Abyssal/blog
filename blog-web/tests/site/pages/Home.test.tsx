@@ -75,7 +75,8 @@ describe('Home Page', () => {
 
     const categoryNav = screen.getByRole('navigation', { name: '文章分类' })
     expect(categoryNav).toBeInTheDocument()
-    expect(categoryNav).toHaveClass('border-b', 'py-1')
+    expect(categoryNav).toHaveClass('-mx-3', 'overflow-x-auto', 'px-3', 'py-1')
+    expect(categoryNav.parentElement).toHaveClass('border-b')
     expect(categoryNav).not.toHaveClass('sm:py-1.5')
     expect(categoryNav).not.toHaveClass('border-y')
     expect(categoryNav.parentElement?.parentElement).not.toHaveClass('pt-2', 'sm:pt-3')

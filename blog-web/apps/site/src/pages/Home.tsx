@@ -139,27 +139,29 @@ const Home: React.FC = () => {
   return (
     <div className="pb-8">
       <div id="articles" className="mx-auto max-w-[69rem] scroll-mt-24">
-          <nav className="category-scroll flex gap-1.5 overflow-x-auto border-b border-slate-200/90 py-1 dark:border-slate-800" aria-label="文章分类">
-            <button
-              type="button"
-              onClick={() => selectCategory(null)}
-              className={categoryButtonClass(selectedCategoryId === null)}
-              aria-pressed={selectedCategoryId === null}
-            >
-              全部文章
-            </button>
-            {serverCategories.map((category) => (
+          <div className="border-b border-slate-200/90 dark:border-slate-800">
+            <nav className="category-scroll -mx-3 flex gap-1.5 overflow-x-auto px-3 py-1" aria-label="文章分类">
               <button
-                key={category.id}
                 type="button"
-                onClick={() => selectCategory(category.id)}
-                className={categoryButtonClass(selectedCategoryId === category.id)}
-                aria-pressed={selectedCategoryId === category.id}
+                onClick={() => selectCategory(null)}
+                className={categoryButtonClass(selectedCategoryId === null)}
+                aria-pressed={selectedCategoryId === null}
               >
-                {category.name}
+                全部文章
               </button>
-            ))}
-          </nav>
+              {serverCategories.map((category) => (
+                <button
+                  key={category.id}
+                  type="button"
+                  onClick={() => selectCategory(category.id)}
+                  className={categoryButtonClass(selectedCategoryId === category.id)}
+                  aria-pressed={selectedCategoryId === category.id}
+                >
+                  {category.name}
+                </button>
+              ))}
+            </nav>
+          </div>
 
           <section className="min-w-0" aria-labelledby="article-list-heading">
             <div className="flex items-center gap-1.5 border-b border-slate-200/90 dark:border-slate-800">
