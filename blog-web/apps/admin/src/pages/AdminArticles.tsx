@@ -40,6 +40,7 @@ interface FilterSelectProps {
   ariaLabel: string
   value: string
   options: FilterOption[]
+  compactLabel?: string
   disabled?: boolean
   onChange: (value: string) => void
 }
@@ -48,6 +49,7 @@ const FilterSelect: React.FC<FilterSelectProps> = ({
   ariaLabel,
   value,
   options,
+  compactLabel,
   disabled = false,
   onChange,
 }) => {
@@ -118,11 +120,12 @@ const FilterSelect: React.FC<FilterSelectProps> = ({
             setOpen(true)
           }
         }}
-        className="control-field flex h-11 w-full min-w-0 items-center justify-between gap-3 rounded-xl border border-slate-300 bg-white pl-3 pr-[0.8125rem] text-left text-sm text-slate-700 shadow-sm outline-none transition-[border-color,box-shadow,background-color] hover:border-slate-400 focus:border-brand-blue focus:ring-4 focus:ring-blue-500/10 disabled:cursor-wait disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
+        className="control-field flex h-11 w-full min-w-0 items-center justify-between gap-0.5 rounded-xl border border-slate-300 bg-white pl-1.5 pr-1 text-left text-xs text-slate-700 shadow-sm outline-none transition-[border-color,box-shadow,background-color] hover:border-slate-400 focus:border-brand-blue focus:ring-4 focus:ring-blue-500/10 disabled:cursor-wait disabled:opacity-60 sm:gap-3 sm:pl-3 sm:pr-[0.8125rem] sm:text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
       >
-        <span className="truncate">{selectedOption.label}</span>
+        <span className="truncate sm:hidden">{value ? selectedOption.label : compactLabel ?? selectedOption.label}</span>
+        <span className="hidden truncate sm:inline">{selectedOption.label}</span>
         <ChevronDown
-          className={`h-4 w-4 shrink-0 text-slate-400 transition-transform duration-150 ${open ? 'rotate-180' : ''}`}
+          className={`h-3 w-3 shrink-0 text-slate-400 transition-transform duration-150 sm:h-4 sm:w-4 ${open ? 'rotate-180' : ''}`}
           aria-hidden
         />
       </button>
@@ -132,7 +135,7 @@ const FilterSelect: React.FC<FilterSelectProps> = ({
           id={listboxId}
           role="listbox"
           aria-label={ariaLabel}
-          className="absolute inset-x-0 top-[calc(100%+0.375rem)] z-40 max-h-60 overflow-y-auto rounded-xl border border-slate-200 bg-white p-1.5 shadow-[0_16px_36px_-18px_rgba(15,23,42,0.45)] dark:border-slate-700 dark:bg-slate-800"
+          className="absolute left-0 top-[calc(100%+0.375rem)] z-40 max-h-60 w-36 overflow-y-auto rounded-xl border border-slate-200 bg-white p-1.5 shadow-[0_16px_36px_-18px_rgba(15,23,42,0.45)] sm:inset-x-0 sm:w-auto dark:border-slate-700 dark:bg-slate-800"
         >
           {options.map((option) => {
             const selected = option.value === value
@@ -446,31 +449,12 @@ const AdminArticles: React.FC = () => {
             )}
           </div>
 
-          <form onSubmit={handleSearch} className="grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-2.5 px-3">
-            <div className="min-w-0">
-              <input
-                aria-label="搜索文章"
-                type="text"
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                placeholder="搜索文章标题或内容…"
-                className="control-field h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-950 shadow-sm outline-none transition-[border-color,box-shadow] placeholder:text-slate-500 hover:border-slate-400 focus:border-brand-blue focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-400 dark:focus:border-blue-400"
-              />
-            </div>
-            <button
-              type="submit"
-              className="admin-action admin-action-primary admin-search-action min-w-[5.5rem] focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue disabled:opacity-50"
-            >
-              <Search className="h-4 w-4" aria-hidden />
-              搜索
-            </button>
-          </form>
-
-          <div className="mt-2 flex flex-col gap-2 px-3 sm:flex-row sm:items-center">
-            <div className="grid min-w-0 flex-1 grid-cols-1 gap-2 sm:grid-cols-3">
+          <form onSubmit={handleSearch} className="flex w-full flex-row items-center gap-1.5 px-3 sm:gap-2">
+            <div className="grid w-[11.625rem] shrink-0 grid-cols-3 gap-1.5 sm:w-auto sm:min-w-0 sm:flex-1 sm:gap-2">
               <FilterSelect
                 ariaLabel="文章状态"
                 value={statusFilter}
+                compactLabel="状态"
                 options={[
                   { value: '', label: '全部状态' },
                   { value: 'draft', label: '草稿' },
@@ -484,6 +468,7 @@ const AdminArticles: React.FC = () => {
               <FilterSelect
                 ariaLabel="文章分类"
                 value={categoryFilter}
+                compactLabel="分类"
                 disabled={filtersLoading}
                 options={[
                   { value: '', label: '全部分类' },
@@ -497,6 +482,7 @@ const AdminArticles: React.FC = () => {
               <FilterSelect
                 ariaLabel="文章标签"
                 value={tagFilter}
+                compactLabel="标签"
                 disabled={filtersLoading}
                 options={[
                   { value: '', label: '全部标签' },
@@ -508,17 +494,36 @@ const AdminArticles: React.FC = () => {
                 }}
               />
             </div>
+            <div className="grid min-w-0 flex-1 grid-cols-[minmax(0,1fr)_auto] items-center gap-1.5 sm:gap-2.5 lg:flex-[1.45_1_0%]">
+              <div className="min-w-0">
+                <input
+                  aria-label="搜索文章"
+                  type="text"
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  placeholder="搜索文章标题或内容…"
+                  className="control-field h-11 w-full rounded-xl border border-slate-300 bg-white px-2 text-xs text-slate-950 shadow-sm outline-none transition-[border-color,box-shadow] placeholder:text-slate-500 hover:border-slate-400 focus:border-brand-blue focus:ring-4 focus:ring-blue-500/10 sm:px-3 sm:text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-400 dark:focus:border-blue-400"
+                />
+              </div>
+              <button
+                type="submit"
+                className="admin-action admin-action-primary admin-search-action admin-toolbar-icon-action min-w-[5.5rem] focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue disabled:opacity-50"
+              >
+                <Search className="h-4 w-4" aria-hidden />
+                <span className="sr-only sm:not-sr-only">搜索</span>
+              </button>
+            </div>
             {hasActiveFilters && (
               <button
                 type="button"
                 onClick={resetFilters}
-                className="admin-action admin-action-secondary shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue"
+                className="admin-action admin-action-secondary admin-toolbar-icon-action shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue"
               >
                 <RotateCcw className="h-4 w-4" aria-hidden />
-                重置
+                <span className="sr-only sm:not-sr-only">重置</span>
               </button>
             )}
-          </div>
+          </form>
         </header>
 
         <div className="flex-1 overflow-auto pb-8">
@@ -545,12 +550,12 @@ const AdminArticles: React.FC = () => {
                 {articles.map((article) => (
                   <li
                     key={article.id}
-                    className="flex flex-col gap-2.5 py-2.5 pl-3 pr-[0.1875rem] transition-colors hover:bg-slate-50/80 dark:hover:bg-slate-800/60 sm:flex-row sm:items-center sm:justify-between"
+                    className="flex flex-row items-start justify-between gap-1.5 py-2.5 pl-3 pr-[0.1875rem] transition-colors hover:bg-slate-50/80 dark:hover:bg-slate-800/60 sm:items-center sm:gap-2.5"
                   >
                     <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="inline-flex max-w-full items-center font-semibold leading-6 text-slate-950 dark:text-white">
-                          <span className="line-clamp-1">{article.title || '未命名'}</span>
+                      <div className="flex min-w-0 items-center gap-2">
+                        <span className="inline-flex min-w-0 flex-1 items-center font-semibold leading-6 text-slate-950 dark:text-white">
+                          <span className="block truncate">{article.title || '未命名'}</span>
                         </span>
                         {article.status === 'draft' && (
                           <span className="rounded-xl border border-slate-300 bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300">
@@ -575,7 +580,7 @@ const AdminArticles: React.FC = () => {
                         </span>
                       </div>
                     </div>
-                    <div className="flex shrink-0 flex-wrap items-center gap-0.5 border-t border-slate-200 pt-2 dark:border-slate-700 sm:border-t-0 sm:pt-0">
+                    <div className="flex shrink-0 flex-wrap items-center gap-0.5">
                       <Link
                         to={`/write?edit=${article.id}`}
                         className="admin-action admin-action-compact font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-white"

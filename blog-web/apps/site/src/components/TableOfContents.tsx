@@ -99,10 +99,10 @@ const TableOfContents: React.FC<TableOfContentsProps> = ({ content, collapsible 
 
   if (collapsible) {
     return (
-      <details className="group border-y border-slate-200 dark:border-slate-700">
-        <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-4 text-sm font-bold text-slate-950 outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-blue [&::-webkit-details-marker]:hidden dark:text-white">
-          <span>本文目录</span>
-          <span className="flex items-center gap-2">
+      <details className="group border-b border-slate-200 dark:border-slate-700">
+        <summary className="flex min-h-10 cursor-pointer list-none items-center justify-start gap-2 text-sm font-bold text-slate-950 outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-blue [&::-webkit-details-marker]:hidden dark:text-white">
+          <span className="-translate-y-1">本文目录</span>
+          <span className="-translate-y-1 flex items-center gap-2">
             <span className="utility-type text-[10px] font-medium tracking-wide text-slate-500 dark:text-slate-400">
               {toc.length} 节
             </span>

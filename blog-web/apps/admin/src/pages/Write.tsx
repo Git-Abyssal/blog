@@ -136,7 +136,7 @@ const EditorSelect: React.FC<EditorSelectProps> = ({
   return (
     <div
       ref={containerRef}
-      className="relative min-w-0"
+      className="relative min-w-0 flex-1"
       onBlur={() => {
         requestAnimationFrame(() => {
           if (!containerRef.current?.contains(document.activeElement)) setOpen(false);
@@ -160,7 +160,7 @@ const EditorSelect: React.FC<EditorSelectProps> = ({
             setOpen(true);
           }
         }}
-        className={`flex h-11 max-w-full items-center justify-between gap-2 rounded-xl border bg-white px-3 text-left text-sm font-medium text-slate-700 outline-none transition-[border-color,box-shadow,background-color] hover:border-slate-400 focus-visible:border-brand-blue focus-visible:ring-4 focus-visible:ring-blue-500/10 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-800 dark:text-slate-200 ${
+        className={`flex h-11 w-full max-w-full items-center justify-between gap-2 rounded-xl border bg-white px-3 text-left text-sm font-medium text-slate-700 outline-none transition-[border-color,box-shadow,background-color] hover:border-slate-400 focus-visible:border-brand-blue focus-visible:ring-4 focus-visible:ring-blue-500/10 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-800 dark:text-slate-200 ${
           open
             ? 'border-brand-blue ring-4 ring-blue-500/10'
             : 'border-slate-300 dark:border-slate-700'
@@ -689,26 +689,27 @@ const Write: React.FC = () => {
       )}
 
       {/* 顶部：返回列表 + 标题 + 保存 + 发布 */}
-      <div className="admin-surface mb-4 flex flex-col gap-3 rounded-2xl border border-slate-300 bg-white px-3 py-3 dark:border-slate-700 dark:bg-slate-900 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:px-4">
+      <div className="admin-surface mb-4 grid grid-cols-[auto_1fr_auto] items-center gap-3 rounded-2xl border border-slate-300 bg-white px-3 py-3 dark:border-slate-700 dark:bg-slate-900 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:gap-4 sm:px-4">
         <Link
           to="/articles"
-          className="admin-action admin-action-secondary shrink-0 self-start focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue sm:self-auto"
+          aria-label="返回文章列表"
+          className="admin-action admin-action-secondary col-start-1 row-start-1 h-11 w-11 shrink-0 !px-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue sm:w-auto sm:!px-[0.9rem]"
         >
           <ArrowLeft className="h-4 w-4" aria-hidden />
-          返回文章列表
+          <span className="hidden sm:inline">返回文章列表</span>
         </Link>
         <input
           type="text"
           aria-label="文章标题"
           placeholder="输入文章标题…"
-          className="min-w-0 flex-1 border-b border-slate-300 bg-transparent px-1 py-2 text-xl font-bold tracking-tight text-slate-950 outline-none transition-colors placeholder:text-slate-500 focus:border-brand-blue dark:border-slate-700 dark:text-white dark:placeholder:text-slate-400 md:text-2xl"
+          className="col-start-2 row-start-1 min-w-0 border-b border-slate-300 bg-transparent px-1 py-2 text-xl font-bold tracking-tight text-slate-950 outline-none transition-colors placeholder:text-slate-500 focus:border-brand-blue dark:border-slate-700 dark:text-white dark:placeholder:text-slate-400 md:text-2xl"
           value={title}
           onChange={(e) => {
             setTitle(e.target.value);
             markDirty();
           }}
         />
-        <div className="flex shrink-0 items-center justify-end gap-2">
+        <div className="col-start-3 row-start-1 flex shrink-0 items-center justify-end gap-2">
           {lastSaved && (
             <span className="sr-only text-xs text-slate-500 dark:text-slate-400 sm:not-sr-only">已自动保存</span>
           )}
@@ -716,19 +717,21 @@ const Write: React.FC = () => {
             type="button"
             onClick={handleDraftBox}
             disabled={savingDraft || publishing}
-            className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition-colors hover:border-brand-blue hover:text-brand-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:text-slate-300 dark:hover:border-blue-400 dark:hover:text-blue-400"
+            aria-label="保存"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-slate-300 !px-0 py-2 text-sm font-semibold text-slate-700 transition-colors hover:border-brand-blue hover:text-brand-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:!px-4 dark:border-slate-700 dark:text-slate-300 dark:hover:border-blue-400 dark:hover:text-blue-400"
           >
-            {savingDraft ? <Loader2 className="inline h-4 w-4 mr-1.5 animate-spin align-middle" /> : <Save className="inline h-4 w-4 mr-1.5 align-middle" />}
-            保存
+            {savingDraft ? <Loader2 className="inline h-4 w-4 animate-spin align-middle sm:mr-1.5" /> : <Save className="inline h-4 w-4 align-middle sm:mr-1.5" />}
+            <span className="hidden sm:inline">保存</span>
           </button>
           <button
             type="button"
             onClick={handlePublish}
             disabled={publishing || savingDraft}
-            className="flex min-h-11 items-center gap-1.5 rounded-xl bg-slate-950 px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue disabled:cursor-not-allowed disabled:opacity-50 dark:bg-white dark:text-slate-950 dark:hover:bg-blue-300"
+            aria-label="发布"
+            className="flex h-11 w-11 items-center justify-center gap-1.5 rounded-xl bg-slate-950 !px-0 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:!px-5 dark:bg-white dark:text-slate-950 dark:hover:bg-blue-300"
           >
             {publishing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-            发布
+            <span className="hidden sm:inline">发布</span>
           </button>
         </div>
       </div>
@@ -850,7 +853,7 @@ const Write: React.FC = () => {
       </div>
 
       {/* 分类和标签 */}
-      <div className="flex flex-wrap items-center gap-x-5 gap-y-3 rounded-b-2xl border-x border-b border-slate-300 bg-white px-4 py-3 md:rounded-none dark:border-slate-700 dark:bg-slate-900">
+      <div className="grid grid-cols-2 gap-3 rounded-b-2xl border-x border-b border-slate-300 bg-white px-4 py-3 sm:items-center sm:gap-x-5 sm:gap-y-3 md:rounded-none dark:border-slate-700 dark:bg-slate-900">
         <div className="flex min-w-0 max-w-full items-center gap-2">
           <label htmlFor="write-category" className="shrink-0 text-sm font-semibold text-slate-700 dark:text-slate-300">分类</label>
           <EditorSelect
@@ -866,8 +869,7 @@ const Write: React.FC = () => {
             }}
           />
         </div>
-        <div className="hidden h-6 w-px bg-slate-200 sm:block dark:bg-slate-700" aria-hidden />
-        <div className="flex min-w-0 basis-full flex-wrap items-center gap-2 sm:basis-auto">
+        <div className="flex min-w-0 flex-wrap items-center gap-2">
           <label htmlFor="write-tag" className="shrink-0 text-sm font-semibold text-slate-700 dark:text-slate-300">标签</label>
           {selectedTags.map((tagId) => {
             const tag = tags.find((t) => t.id === tagId);
@@ -906,7 +908,7 @@ const Write: React.FC = () => {
         <button
           type="button"
           onClick={() => setMobilePane('edit')}
-          className={`inline-flex min-h-11 items-center justify-center gap-2 border-b-2 px-3 py-2 text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-blue ${mobilePane === 'edit' ? 'border-brand-blue bg-white text-slate-950 dark:bg-slate-900 dark:text-white' : 'border-transparent text-slate-500 dark:text-slate-400'}`}
+          className={`inline-flex min-h-11 items-center justify-center gap-2 px-3 py-2 text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-blue ${mobilePane === 'edit' ? 'bg-white text-slate-950 dark:bg-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400'}`}
           aria-pressed={mobilePane === 'edit'}
         >
           <PencilLine className="h-4 w-4" aria-hidden /> 编辑
@@ -914,7 +916,7 @@ const Write: React.FC = () => {
         <button
           type="button"
           onClick={() => setMobilePane('preview')}
-          className={`inline-flex min-h-11 items-center justify-center gap-2 border-b-2 px-3 py-2 text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-blue ${mobilePane === 'preview' ? 'border-brand-blue bg-white text-slate-950 dark:bg-slate-900 dark:text-white' : 'border-transparent text-slate-500 dark:text-slate-400'}`}
+          className={`inline-flex min-h-11 items-center justify-center gap-2 px-3 py-2 text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-blue ${mobilePane === 'preview' ? 'bg-white text-slate-950 dark:bg-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400'}`}
           aria-pressed={mobilePane === 'preview'}
         >
           <Eye className="h-4 w-4" aria-hidden /> 预览
@@ -922,13 +924,13 @@ const Write: React.FC = () => {
       </div>
 
       {/* 左右分栏：编辑区 + 实时预览 */}
-      <div className="flex min-h-[28rem] flex-1 overflow-hidden rounded-b-2xl border border-slate-300 md:min-h-0 md:flex-row md:border-t-0 dark:border-slate-700">
+      <div className="flex min-h-[28rem] flex-1 overflow-hidden rounded-2xl border border-slate-300 md:min-h-0 md:flex-row md:rounded-b-2xl md:rounded-t-none md:border-t-0 dark:border-slate-700">
         <div className={`${mobilePane === 'edit' ? 'flex' : 'hidden'} min-w-0 flex-1 flex-col bg-white md:flex md:w-1/2 md:flex-none dark:bg-slate-900`}>
           <textarea
             ref={contentRef}
             aria-label="文章正文"
             placeholder="输入正文（支持 Markdown 富文本）…"
-            className="w-full flex-1 resize-none rounded-b-2xl bg-white p-5 font-mono text-[14px] leading-7 text-slate-900 outline-none placeholder:text-slate-500 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-blue md:rounded-bl-2xl md:rounded-br-none dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-400"
+            className="w-full flex-1 resize-none rounded-2xl bg-white p-5 font-mono text-[14px] leading-7 text-slate-900 outline-none placeholder:text-slate-500 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-blue md:rounded-bl-2xl md:rounded-br-none md:rounded-t-none dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-400"
             value={content}
             onChange={(e) => {
               setContent(e.target.value);

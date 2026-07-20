@@ -55,10 +55,26 @@ describe('TableOfContents', () => {
 
     expect(screen.getByText('2 节')).toBeInTheDocument()
     expect(screen.getByText('2 节').closest('details')).toHaveClass(
-      'border-y',
+      'border-b',
       'border-slate-200',
       'dark:border-slate-700',
     )
+    expect(screen.getByText('2 节').closest('details')).not.toHaveClass('border-t', 'border-y')
+    expect(screen.getByText('本文目录').closest('summary')).toHaveClass(
+      'flex',
+      'min-h-10',
+      'items-center',
+      'justify-start',
+    )
+    expect(screen.getByText('本文目录').closest('summary')).not.toHaveClass(
+      'grid',
+      'min-h-12',
+      'grid-cols-[1fr_auto_1fr]',
+      'justify-between',
+    )
+    expect(screen.getByText('本文目录')).toHaveClass('-translate-y-1')
+    expect(screen.getByText('2 节').parentElement).toHaveClass('-translate-y-1', 'items-center')
+    expect(screen.getByText('本文目录')).not.toHaveClass('col-start-2', 'text-center')
     expect(screen.getByRole('navigation', { name: '本文目录' })).toHaveClass(
       'border-t',
       'border-slate-200',

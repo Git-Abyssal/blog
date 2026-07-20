@@ -22,7 +22,9 @@ describe('public header', () => {
     expect(screen.getByRole('link', { name: '返回文章首页' })).toHaveTextContent('ABYSSAL')
     expect(screen.getByRole('searchbox', { name: '搜索文章' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: '切换主题' })).toBeInTheDocument()
-    expect(screen.getByRole('banner').firstElementChild).toHaveClass('h-16')
+    const banner = screen.getByRole('banner')
+    expect(banner).not.toHaveClass('border-b')
+    expect(banner.firstElementChild?.firstElementChild).toHaveClass('h-16', 'max-w-[69rem]', 'border-b')
   })
 
   it('removes the global header from article detail pages', () => {

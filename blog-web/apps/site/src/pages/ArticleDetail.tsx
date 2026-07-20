@@ -385,17 +385,17 @@ const ArticleDetail: React.FC = () => {
       </div>
 
       <SEO article={article} />
-      <div className="mx-auto max-w-[76rem] py-3 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:py-4 lg:pb-8">
+      <div className="mx-auto max-w-[76rem] pb-[calc(1rem+env(safe-area-inset-bottom))] pt-0 sm:pb-4 lg:pb-8">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-8">
           <div className="min-w-0 flex-1">
-            <article className="py-3 sm:py-5 lg:pb-0 lg:pt-0">
-              <div className="border-t border-slate-200 dark:border-slate-700">
-                <Link to={returnTo} className="relative inline-flex min-h-10 items-center rounded-lg text-base font-medium text-slate-500 transition hover:text-brand-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue dark:text-slate-400 sm:min-h-11">
-                  <ChevronLeft className="absolute right-full h-4 w-4" aria-hidden />
+            <article className="pb-2.5 pt-0 sm:pb-5 lg:pb-0">
+              <div>
+                <Link to={returnTo} className="relative inline-flex min-h-11 items-center rounded-lg text-lg font-medium text-slate-500 transition hover:text-brand-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue dark:text-slate-400">
+                  <ChevronLeft className="absolute right-full h-5 w-5" aria-hidden />
                   <span>返回文章列表</span>
                 </Link>
               </div>
-              <div className="flex flex-col items-start gap-3 sm:flex-row sm:justify-between">
+              <div className="flex flex-col items-start gap-3 border-t border-slate-200 pt-2 sm:flex-row sm:justify-between dark:border-slate-700">
                 <div className="w-full min-w-0 flex-1">
                   <h1 className="display-type break-words whitespace-normal text-3xl font-bold leading-[1.1] tracking-[-0.035em] text-slate-950 sm:text-4xl sm:leading-[1.1] lg:text-[2.7rem] lg:leading-[1.1] dark:text-white">
                     {article.title}
@@ -404,7 +404,7 @@ const ArticleDetail: React.FC = () => {
               </div>
 
               {/* Article metadata */}
-              <div className="mb-2.5 flex min-h-10 flex-wrap items-center gap-x-4 gap-y-1 border-slate-200 text-sm text-slate-500 sm:min-h-11 sm:gap-x-5 sm:gap-y-2 lg:border-b dark:border-slate-700 dark:text-slate-400">
+              <div className="mb-2.5 flex min-h-10 flex-wrap items-center gap-x-4 gap-y-1 border-b border-slate-200 text-sm text-slate-500 sm:min-h-11 sm:gap-x-5 sm:gap-y-2 dark:border-slate-700 dark:text-slate-400">
                 <span className="flex items-center gap-1.5"><Calendar className="h-3.5 w-3.5" aria-hidden />{new Date(article.createdAt).toLocaleDateString()}</span>
                 {(article.category?.name || article.tags?.length) && (
                   <div className="flex flex-wrap items-center gap-2">
@@ -414,7 +414,7 @@ const ArticleDetail: React.FC = () => {
                 )}
               </div>
 
-              <div className="mb-7 lg:hidden">
+              <div className="mb-[9px] lg:hidden">
                 <TableOfContents content={article.content ?? ''} collapsible />
               </div>
 
@@ -464,8 +464,8 @@ const ArticleDetail: React.FC = () => {
             </article>
 
             {/* ========== Comment Section ========== */}
-            <section ref={commentSectionRef} tabIndex={-1} aria-labelledby="comments-title" className="mt-2 border-t border-slate-200 dark:border-slate-700">
-              <div className="flex min-h-14 items-center justify-between gap-4">
+            <section ref={commentSectionRef} tabIndex={-1} aria-labelledby="comments-title" className="mt-0 border-t border-slate-200 sm:mt-2 dark:border-slate-700">
+              <div className="flex min-h-12 items-center justify-between gap-4">
                 <h2 id="comments-title" className="text-xl font-bold text-slate-950 dark:text-white">评论 <span className="font-normal text-slate-500 dark:text-slate-400">{commentsTotalElements}</span></h2>
                 <div className="hidden items-center text-sm lg:flex">
                   <button type="button" onClick={() => copyToClipboard(window.location.href, '链接已复制')} className="flex min-h-11 items-center gap-2 rounded-xl text-slate-500 transition-colors hover:text-brand-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue dark:text-slate-400">
@@ -476,9 +476,9 @@ const ArticleDetail: React.FC = () => {
               </div>
 
               {/* Comment form */}
-              <form onSubmit={handleSubmitComment} className="border-y border-slate-200 py-4 dark:border-slate-700">
+              <form onSubmit={handleSubmitComment} className="border-y border-slate-200 py-3 dark:border-slate-700">
                 <div>
-                  <div className="mb-2 flex items-center justify-between gap-3">
+                  <div className="mb-1.5 flex items-center justify-between gap-3">
                     <label htmlFor="comment-content" className="text-xs font-semibold text-slate-700 dark:text-slate-200">评论内容</label>
                     <span className="utility-type text-[11px] text-slate-500 dark:text-slate-400" aria-hidden>
                       {commentContent.length} / 1000
@@ -500,9 +500,9 @@ const ArticleDetail: React.FC = () => {
                     className="control-field block w-full resize-y rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm leading-6 text-slate-900 outline-none transition placeholder:text-slate-500 focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/15 dark:border-slate-600 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-400 dark:focus:border-blue-400 dark:focus:ring-blue-400/20"
                   />
                 </div>
-                <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end">
+                <div className="mt-3 flex flex-col gap-2.5 sm:flex-row sm:items-end">
                   <div className="min-w-0 flex-1">
-                    <label htmlFor="comment-guest-name" className="mb-2 block text-xs font-semibold text-slate-700 dark:text-slate-200">你的昵称</label>
+                    <label htmlFor="comment-guest-name" className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-200">你的昵称</label>
                     <input
                       id="comment-guest-name"
                       required
@@ -581,13 +581,13 @@ const ArticleDetail: React.FC = () => {
                   )}
                 </div>
               ) : (
-                <div className="py-8 text-center text-slate-500 dark:text-slate-400">还没有评论</div>
+                <div className="pb-4 pt-3 text-center text-slate-500 dark:text-slate-400 lg:pb-0">还没有评论</div>
               )}
             </section>
           </div>
 
           {/* ========== Sidebar ========== */}
-          <aside className="sticky top-4 hidden max-h-[calc(100vh-2rem)] w-72 shrink-0 self-start space-y-2 overflow-y-auto pr-1 lg:block">
+          <aside className="sticky top-4 hidden max-h-[calc(100vh-2rem)] w-72 shrink-0 self-start space-y-2 overflow-y-auto pr-1 lg:mt-11 lg:block">
             {/* Dynamic Table of Contents */}
             <TableOfContents content={article.content ?? ''} />
 

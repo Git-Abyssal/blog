@@ -106,9 +106,10 @@ describe('ArticleDetail comments', () => {
       'href',
       '/?tab=latest#articles',
     )
-    expect(returnLink).toHaveClass('relative', 'text-base')
-    expect(returnLink.querySelector('svg')).toHaveClass('absolute', 'right-full')
-    expect(returnLink.parentElement).toHaveClass('border-t', 'border-slate-200')
+    expect(returnLink).toHaveClass('relative', 'text-lg')
+    expect(returnLink.querySelector('svg')).toHaveClass('absolute', 'right-full', 'h-5', 'w-5')
+    expect(returnLink.parentElement).not.toHaveClass('border-t', 'border-slate-200')
+    expect(returnLink.parentElement?.nextElementSibling).toHaveClass('border-t', 'border-slate-200', 'pt-2')
     expect(returnLink.parentElement).not.toHaveClass('mb-4')
     expect(returnLink.parentElement).not.toHaveClass('border-b', 'border-y')
     expect(returnLink).not.toHaveClass('-ms-2', 'sm:-ms-6', 'gap-1', 'px-1')
@@ -179,29 +180,32 @@ describe('ArticleDetail comments', () => {
 
     const title = await screen.findByRole('heading', { name: '一篇工程记录' })
     const articleElement = title.closest('article')
+    expect(articleElement?.parentElement?.parentElement?.parentElement).toHaveClass('pt-0')
     expect(title.parentElement?.parentElement).not.toHaveClass('my-2')
-    expect(articleElement).toHaveClass('lg:pt-0')
+    expect(articleElement).toHaveClass('pb-2.5', 'pt-0', 'sm:pb-5')
     expect(articleElement).not.toHaveClass('lg:pt-6')
     expect(articleElement).not.toHaveClass('rounded-3xl', 'border', 'bg-white', 'shadow-sm')
+    const mobileTocSlot = Array.from(articleElement?.children ?? [])
+      .find((element) => element.classList.contains('lg:hidden'))
+    expect(mobileTocSlot).toHaveClass('mb-[9px]', 'lg:hidden')
 
     const date = await screen.findByText(new Date(article.createdAt).toLocaleDateString())
-    expect(date.parentElement).toHaveClass('mb-2.5', 'min-h-10', 'sm:min-h-11', 'lg:border-b')
-    expect(date.parentElement).not.toHaveClass('border-b')
+    expect(date.parentElement).toHaveClass('mb-2.5', 'min-h-10', 'sm:min-h-11', 'border-b')
     expect(date.parentElement).not.toHaveClass('pb-4')
 
     const comments = screen.getByRole('heading', { name: '评论 1' }).closest('section')
-    expect(comments).toHaveClass('mt-2', 'border-t', 'border-slate-200', 'dark:border-slate-700')
+    expect(comments).toHaveClass('mt-0', 'sm:mt-2', 'border-t', 'border-slate-200', 'dark:border-slate-700')
     expect(comments).not.toHaveClass('border-slate-300')
     expect(comments).not.toHaveClass('lg:border-t-0')
     const commentHeadingRow = screen.getByRole('heading', { name: '评论 1' }).parentElement
-    expect(commentHeadingRow).toHaveClass('min-h-14', 'items-center', 'justify-between')
+    expect(commentHeadingRow).toHaveClass('min-h-12', 'items-center', 'justify-between')
     expect(comments).not.toHaveClass('rounded-3xl', 'bg-white', 'shadow-sm')
 
     expect(screen.queryByRole('button', { name: '1 条评论' })).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: '复制链接' }).parentElement?.parentElement).toBe(commentHeadingRow)
 
     const commentForm = screen.getByLabelText('你的昵称').closest('form')
-    expect(commentForm).toHaveClass('border-y', 'py-4')
+    expect(commentForm).toHaveClass('border-y', 'py-3')
     expect(commentForm).not.toHaveClass('mb-3.5')
     expect(commentForm).not.toHaveClass('rounded-2xl', 'bg-slate-50')
     const commentContent = screen.getByLabelText('评论内容')
@@ -209,16 +213,16 @@ describe('ArticleDetail comments', () => {
     expect(commentContent.compareDocumentPosition(guestName) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     const commentFooter = guestName.parentElement?.parentElement
     expect(commentFooter).toHaveClass(
-      'mt-4',
+      'mt-3',
       'flex',
       'flex-col',
-      'gap-3',
+      'gap-2.5',
       'sm:flex-row',
       'sm:items-end',
     )
     expect(guestName.parentElement).toHaveClass('min-w-0', 'flex-1')
     expect(guestName.parentElement).not.toHaveClass('sm:max-w-sm')
-    expect(screen.getByText('你的昵称', { selector: 'label' })).toHaveClass('block', 'mb-2')
+    expect(screen.getByText('你的昵称', { selector: 'label' })).toHaveClass('block', 'mb-1.5')
     expect(guestName).toHaveClass('w-full')
     expect(guestName).toHaveAttribute('placeholder', '怎么称呼你')
     expect(screen.getByRole('button', { name: '提交审核' }).parentElement).toBe(commentFooter)
@@ -338,7 +342,7 @@ describe('ArticleDetail comments', () => {
     expect(relatedSection).toHaveClass('border-y', 'border-slate-200', 'pt-2', 'dark:border-slate-700')
     expect(relatedSection).not.toHaveClass('border-t')
     expect(relatedSection).not.toHaveClass('border-slate-300', 'border-slate-400', 'dark:border-slate-600')
-    expect(relatedSection?.closest('aside')).toHaveClass('space-y-2')
+    expect(relatedSection?.closest('aside')).toHaveClass('space-y-2', 'lg:mt-11')
     const relatedLink = screen.getByRole('link', { name: /下一篇文章/ })
     expect(relatedLink).toHaveClass('py-1')
     expect(relatedLink.querySelector('p')).toHaveClass('leading-4')
@@ -434,5 +438,21 @@ describe('ArticleDetail comments', () => {
     expect(screen.queryByText('暂无评论，快来发表第一条评论吧！')).not.toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: '重新加载评论' }))
     expect(refetchComments).toHaveBeenCalledTimes(1)
+  })
+
+  it('balances the empty comments spacing with the page bottom padding', async () => {
+    vi.mocked(useThreadedComments).mockReturnValue(threadedCommentsResult({
+      content: [],
+      totalElements: 0,
+      totalPages: 0,
+      number: 0,
+      size: 20,
+    }))
+
+    renderPage()
+
+    const emptyState = await screen.findByText('还没有评论')
+    expect(emptyState).toHaveClass('pt-3', 'pb-4', 'lg:pb-0', 'text-center')
+    expect(emptyState).not.toHaveClass('py-8')
   })
 })

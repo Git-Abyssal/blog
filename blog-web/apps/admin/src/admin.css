@@ -11,10 +11,6 @@
   isolation: isolate;
 }
 
-.admin-topbar {
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.75);
-}
-
 .admin-panel,
 .admin-surface {
   border-color: var(--admin-panel-border);
@@ -136,10 +132,6 @@
   --admin-panel-shadow: 0 28px 75px -52px rgba(0, 0, 0, 0.95);
 }
 
-.dark .admin-topbar {
-  box-shadow: none;
-}
-
 .dark .admin-panel {
   background: rgba(17, 25, 37, 0.9);
 }
@@ -192,5 +184,14 @@
 
   .admin-action:hover:not(:disabled) {
     transform: none;
+  }
+}
+
+@media (max-width: 639px) {
+  .admin-toolbar-icon-action,
+  .admin-search-action {
+    min-width: 2.75rem;
+    padding-right: 0;
+    padding-left: 0;
   }
 }
