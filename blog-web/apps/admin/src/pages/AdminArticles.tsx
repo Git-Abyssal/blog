@@ -550,20 +550,20 @@ const AdminArticles: React.FC = () => {
                 {articles.map((article) => (
                   <li
                     key={article.id}
-                    className="flex flex-row items-start justify-between gap-1.5 py-2.5 pl-3 pr-[0.1875rem] transition-colors hover:bg-slate-50/80 dark:hover:bg-slate-800/60 sm:items-center sm:gap-2.5"
+                    className="flex flex-row items-center justify-between gap-1.5 py-2.5 pl-3 pr-[0.1875rem] transition-colors hover:bg-slate-50/80 dark:hover:bg-slate-800/60 sm:gap-2.5"
                   >
                     <div className="min-w-0 flex-1">
                       <div className="flex min-w-0 items-center gap-2">
-                        <span className="inline-flex min-w-0 flex-1 items-center font-semibold leading-6 text-slate-950 dark:text-white">
-                          <span className="block truncate">{article.title || '未命名'}</span>
+                        <span className="min-w-0 truncate font-semibold leading-6 text-slate-950 dark:text-white">
+                          {article.title || '未命名'}
                         </span>
                         {article.status === 'draft' && (
-                          <span className="rounded-xl border border-slate-300 bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                          <span className="shrink-0 whitespace-nowrap rounded-xl border border-slate-300 bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300">
                             草稿
                           </span>
                         )}
                         {article.status === 'published' && (
-                          <span className="rounded-xl border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:border-emerald-900 dark:bg-emerald-500/10 dark:text-emerald-400">
+                          <span className="shrink-0 whitespace-nowrap rounded-xl border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:border-emerald-900 dark:bg-emerald-500/10 dark:text-emerald-400">
                             已发布
                           </span>
                         )}
