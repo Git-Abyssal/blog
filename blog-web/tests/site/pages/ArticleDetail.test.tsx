@@ -199,7 +199,7 @@ describe('ArticleDetail comments', () => {
       'min-[1400px]:fixed',
       'min-[1400px]:left-[calc(50%_-_39rem)]',
       'min-[1400px]:right-auto',
-      'min-[1400px]:top-0',
+      'min-[1400px]:top-1',
       'min-[1400px]:z-40',
     )
     const returnLink = screen.getByRole('link', { name: '返回文章列表' })

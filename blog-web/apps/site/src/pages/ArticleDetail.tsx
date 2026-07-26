@@ -390,7 +390,7 @@ const ArticleDetail: React.FC = () => {
           <div className="min-w-0 flex-1 xl:w-[50rem] xl:flex-none">
             <article className="pb-2.5 pt-0 sm:pb-5 lg:pb-0">
               <div className="relative">
-                <div className="min-[1400px]:fixed min-[1400px]:left-[calc(50%_-_39rem)] min-[1400px]:right-auto min-[1400px]:top-0 min-[1400px]:z-40">
+                <div className="min-[1400px]:fixed min-[1400px]:left-[calc(50%_-_39rem)] min-[1400px]:right-auto min-[1400px]:top-1 min-[1400px]:z-40">
                   <Link to={returnTo} className="relative inline-flex min-h-11 items-start whitespace-nowrap rounded-lg pt-2 text-lg font-medium leading-[1.1] text-slate-500 transition hover:text-brand-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue dark:text-slate-400">
                     <ChevronLeft className="absolute right-full top-2 h-5 w-5" aria-hidden />
                     <span>返回文章列表</span>
