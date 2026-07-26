@@ -199,10 +199,12 @@ describe('ArticleDetail comments', () => {
       'min-[1400px]:fixed',
       'min-[1400px]:left-[calc(50%_-_39rem)]',
       'min-[1400px]:right-auto',
-      'min-[1400px]:top-2',
+      'min-[1400px]:top-0',
       'min-[1400px]:z-40',
     )
-    expect(screen.getByRole('link', { name: '返回文章列表' })).toHaveClass('whitespace-nowrap')
+    const returnLink = screen.getByRole('link', { name: '返回文章列表' })
+    expect(returnLink).toHaveClass('items-start', 'whitespace-nowrap', 'pt-2', 'leading-[1.1]')
+    expect(returnLink.querySelector('svg')).toHaveClass('top-2')
     expect(returnLinkSlot?.parentElement).toHaveClass('relative')
     const mobileTocSlot = Array.from(articleElement?.children ?? [])
       .find((element) => element.classList.contains('lg:hidden'))
