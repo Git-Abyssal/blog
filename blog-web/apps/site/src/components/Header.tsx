@@ -55,7 +55,7 @@ const Header: React.FC = () => {
             className="inline-flex min-h-11 min-w-11 items-center gap-2.5 rounded-lg pr-2 text-slate-800 outline-none transition-colors hover:text-brand-blue focus-visible:ring-2 focus-visible:ring-brand-blue focus-visible:ring-offset-2 dark:text-slate-100 dark:focus-visible:ring-offset-slate-950"
           >
             <span className="h-5 w-0.5 bg-brand-blue" aria-hidden />
-            <span className="utility-type text-[11px] font-bold tracking-[0.2em]">ABYSSAL</span>
+            <span className="utility-type text-[11px] font-bold tracking-[0.2em]">首页</span>
           </Link>
 
           <div className="flex items-center gap-2.5">

@@ -180,14 +180,34 @@ describe('ArticleDetail comments', () => {
 
     const title = await screen.findByRole('heading', { name: '一篇工程记录' })
     const articleElement = title.closest('article')
+    const contentColumn = articleElement?.parentElement
+    expect(contentColumn).toHaveClass('min-w-0', 'flex-1', 'xl:w-[50rem]', 'xl:flex-none')
+    expect(contentColumn?.parentElement).toHaveClass(
+      'lg:gap-8',
+      'xl:justify-center',
+      'relative',
+      'min-[1400px]:left-[5rem]',
+      'min-[1400px]:gap-10',
+    )
     expect(articleElement?.parentElement?.parentElement?.parentElement).toHaveClass('pt-0')
     expect(title.parentElement?.parentElement).not.toHaveClass('my-2')
     expect(articleElement).toHaveClass('pb-2.5', 'pt-0', 'sm:pb-5')
     expect(articleElement).not.toHaveClass('lg:pt-6')
     expect(articleElement).not.toHaveClass('rounded-3xl', 'border', 'bg-white', 'shadow-sm')
+    const returnLinkSlot = screen.getByRole('link', { name: '返回文章列表' }).parentElement
+    expect(returnLinkSlot).toHaveClass(
+      'min-[1400px]:fixed',
+      'min-[1400px]:left-[calc(50%_-_39rem)]',
+      'min-[1400px]:right-auto',
+      'min-[1400px]:top-2',
+      'min-[1400px]:z-40',
+    )
+    expect(screen.getByRole('link', { name: '返回文章列表' })).toHaveClass('whitespace-nowrap')
+    expect(returnLinkSlot?.parentElement).toHaveClass('relative')
     const mobileTocSlot = Array.from(articleElement?.children ?? [])
       .find((element) => element.classList.contains('lg:hidden'))
     expect(mobileTocSlot).toHaveClass('mb-[9px]', 'lg:hidden')
+    expect(articleElement?.querySelector('.article-prose')).toHaveClass('w-full', '!max-w-none')
 
     const date = await screen.findByText(new Date(article.createdAt).toLocaleDateString())
     expect(date.parentElement).toHaveClass('mb-2.5', 'min-h-10', 'sm:min-h-11', 'border-b')
@@ -342,7 +362,9 @@ describe('ArticleDetail comments', () => {
     expect(relatedSection).toHaveClass('border-y', 'border-slate-200', 'pt-2', 'dark:border-slate-700')
     expect(relatedSection).not.toHaveClass('border-t')
     expect(relatedSection).not.toHaveClass('border-slate-300', 'border-slate-400', 'dark:border-slate-600')
-    expect(relatedSection?.closest('aside')).toHaveClass('space-y-2', 'lg:mt-11')
+    expect(relatedSection?.closest('aside')).toHaveClass('space-y-2', 'top-0')
+    expect(relatedSection?.closest('aside')).not.toHaveClass('lg:mt-11')
+    expect(relatedSection?.closest('aside')).not.toHaveClass('top-4')
     const relatedLink = screen.getByRole('link', { name: /下一篇文章/ })
     expect(relatedLink).toHaveClass('py-1')
     expect(relatedLink.querySelector('p')).toHaveClass('leading-4')

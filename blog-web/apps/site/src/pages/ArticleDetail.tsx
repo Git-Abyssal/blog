@@ -386,20 +386,22 @@ const ArticleDetail: React.FC = () => {
 
       <SEO article={article} />
       <div className="mx-auto max-w-[76rem] pb-[calc(1rem+env(safe-area-inset-bottom))] pt-0 sm:pb-4 lg:pb-8">
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-8">
-          <div className="min-w-0 flex-1">
+        <div className="relative flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-8 xl:justify-center min-[1400px]:left-[5rem] min-[1400px]:gap-10">
+          <div className="min-w-0 flex-1 xl:w-[50rem] xl:flex-none">
             <article className="pb-2.5 pt-0 sm:pb-5 lg:pb-0">
-              <div>
-                <Link to={returnTo} className="relative inline-flex min-h-11 items-center rounded-lg text-lg font-medium text-slate-500 transition hover:text-brand-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue dark:text-slate-400">
-                  <ChevronLeft className="absolute right-full h-5 w-5" aria-hidden />
-                  <span>返回文章列表</span>
-                </Link>
-              </div>
-              <div className="flex flex-col items-start gap-3 border-t border-slate-200 pt-2 sm:flex-row sm:justify-between dark:border-slate-700">
-                <div className="w-full min-w-0 flex-1">
-                  <h1 className="display-type break-words whitespace-normal text-3xl font-bold leading-[1.1] tracking-[-0.035em] text-slate-950 sm:text-4xl sm:leading-[1.1] lg:text-[2.7rem] lg:leading-[1.1] dark:text-white">
-                    {article.title}
-                  </h1>
+              <div className="relative">
+                <div className="min-[1400px]:fixed min-[1400px]:left-[calc(50%_-_39rem)] min-[1400px]:right-auto min-[1400px]:top-2 min-[1400px]:z-40">
+                  <Link to={returnTo} className="relative inline-flex min-h-11 items-center whitespace-nowrap rounded-lg text-lg font-medium text-slate-500 transition hover:text-brand-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue dark:text-slate-400">
+                    <ChevronLeft className="absolute right-full h-5 w-5" aria-hidden />
+                    <span>返回文章列表</span>
+                  </Link>
+                </div>
+                <div className="flex flex-col items-start gap-3 border-t border-slate-200 pt-2 sm:flex-row sm:justify-between dark:border-slate-700">
+                  <div className="w-full min-w-0 flex-1">
+                    <h1 className="display-type break-words whitespace-normal text-3xl font-bold leading-[1.1] tracking-[-0.035em] text-slate-950 sm:text-4xl sm:leading-[1.1] lg:text-[2.7rem] lg:leading-[1.1] dark:text-white">
+                      {article.title}
+                    </h1>
+                  </div>
                 </div>
               </div>
 
@@ -419,7 +421,7 @@ const ArticleDetail: React.FC = () => {
               </div>
 
               {/* Article content with heading IDs for TOC */}
-              <div className="article-prose prose prose-slate prose-headings:scroll-mt-0 prose-pre:bg-transparent prose-pre:p-0 dark:prose-invert">
+              <div className="article-prose prose w-full !max-w-none prose-slate prose-headings:scroll-mt-0 prose-pre:bg-transparent prose-pre:p-0 dark:prose-invert">
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm, remarkHeadingIds]}
                   components={{
@@ -587,7 +589,7 @@ const ArticleDetail: React.FC = () => {
           </div>
 
           {/* ========== Sidebar ========== */}
-          <aside className="sticky top-4 hidden max-h-[calc(100vh-2rem)] w-72 shrink-0 self-start space-y-2 overflow-y-auto pr-1 lg:mt-11 lg:block">
+          <aside className="sticky top-0 hidden max-h-[calc(100vh-2rem)] w-72 shrink-0 self-start space-y-2 overflow-y-auto pr-1 lg:block">
             {/* Dynamic Table of Contents */}
             <TableOfContents content={article.content ?? ''} />
 

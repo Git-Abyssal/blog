@@ -19,7 +19,7 @@ describe('public header', () => {
     )
 
     expect(screen.getByRole('link', { name: '返回文章首页' })).toHaveAttribute('href', '/')
-    expect(screen.getByRole('link', { name: '返回文章首页' })).toHaveTextContent('ABYSSAL')
+    expect(screen.getByRole('link', { name: '返回文章首页' })).toHaveTextContent('首页')
     expect(screen.getByRole('searchbox', { name: '搜索文章' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: '切换主题' })).toBeInTheDocument()
     const banner = screen.getByRole('banner')
