@@ -109,7 +109,13 @@ describe('ArticleDetail comments', () => {
     expect(returnLink).toHaveClass('relative', 'text-lg')
     expect(returnLink.querySelector('svg')).toHaveClass('absolute', 'right-full', 'h-5', 'w-5')
     expect(returnLink.parentElement).not.toHaveClass('border-t', 'border-slate-200')
-    expect(returnLink.parentElement?.nextElementSibling).toHaveClass('border-t', 'border-slate-200', 'pt-2')
+    expect(returnLink.parentElement?.nextElementSibling).toHaveClass(
+      'border-t',
+      'border-slate-200',
+      'pt-2',
+      'lg:border-t-0',
+      'dark:border-slate-700',
+    )
     expect(returnLink.parentElement).not.toHaveClass('mb-4')
     expect(returnLink.parentElement).not.toHaveClass('border-b', 'border-y')
     expect(returnLink).not.toHaveClass('-ms-2', 'sm:-ms-6', 'gap-1', 'px-1')
@@ -189,7 +195,7 @@ describe('ArticleDetail comments', () => {
       'min-[1400px]:left-[5rem]',
       'min-[1400px]:gap-10',
     )
-    expect(articleElement?.parentElement?.parentElement?.parentElement).toHaveClass('pt-0')
+    expect(articleElement?.parentElement?.parentElement?.parentElement).toHaveClass('pt-4', 'lg:pt-6')
     expect(title.parentElement?.parentElement).not.toHaveClass('my-2')
     expect(articleElement).toHaveClass('pb-2.5', 'pt-0', 'sm:pb-5')
     expect(articleElement).not.toHaveClass('lg:pt-6')
@@ -199,7 +205,7 @@ describe('ArticleDetail comments', () => {
       'min-[1400px]:fixed',
       'min-[1400px]:left-[calc(50%_-_39rem)]',
       'min-[1400px]:right-auto',
-      'min-[1400px]:top-1',
+      'min-[1400px]:top-7',
       'min-[1400px]:z-40',
     )
     const returnLink = screen.getByRole('link', { name: '返回文章列表' })

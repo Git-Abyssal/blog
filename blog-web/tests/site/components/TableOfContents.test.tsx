@@ -25,6 +25,8 @@ describe('TableOfContents', () => {
       'border-t',
       'border-slate-200',
       'pt-2',
+      'lg:border-t-0',
+      'dark:border-slate-700',
     )
     expect(screen.getByRole('navigation', { name: '本文目录' })).not.toHaveClass('border-slate-300')
     const tocHeading = screen.getByRole('heading', { name: '本文目录' })

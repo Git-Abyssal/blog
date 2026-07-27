@@ -117,7 +117,7 @@ const TableOfContents: React.FC<TableOfContentsProps> = ({ content, collapsible 
   }
 
   return (
-    <nav aria-label="本文目录" className="border-t border-slate-200 pt-2 dark:border-slate-700">
+    <nav aria-label="本文目录" className="border-t border-slate-200 pt-2 lg:border-t-0 dark:border-slate-700">
       <div className="mb-1.5 flex items-center gap-2 px-1">
         <h3 className="text-sm font-bold text-slate-950 dark:text-white">本文目录</h3>
         <span className="utility-type text-[10px] font-medium tracking-wide text-slate-500 dark:text-slate-400">
