@@ -193,7 +193,7 @@ describe('ArticleDetail comments', () => {
       'xl:justify-center',
       'relative',
       'min-[1400px]:left-[5rem]',
-      'min-[1400px]:gap-20',
+      'min-[1400px]:gap-24',
     )
     expect(articleElement?.parentElement?.parentElement?.parentElement).toHaveClass('pt-4', 'lg:pt-6')
     expect(title.parentElement?.parentElement).not.toHaveClass('my-2')
@@ -203,7 +203,7 @@ describe('ArticleDetail comments', () => {
     const returnLinkSlot = screen.getByRole('link', { name: '返回文章列表' }).parentElement
     expect(returnLinkSlot).toHaveClass(
       'min-[1400px]:fixed',
-      'min-[1400px]:left-[calc(50%_-_41.75rem)]',
+      'min-[1400px]:left-[calc(50%_-_42.25rem)]',
       'min-[1400px]:right-auto',
       'min-[1400px]:top-7',
       'min-[1400px]:z-40',
