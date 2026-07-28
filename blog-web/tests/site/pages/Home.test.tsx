@@ -80,6 +80,9 @@ describe('Home Page', () => {
     expect(categoryNav).not.toHaveClass('sm:py-1.5')
     expect(categoryNav).not.toHaveClass('border-y')
     expect(categoryNav.parentElement?.parentElement).not.toHaveClass('pt-2', 'sm:pt-3')
+    const selectedCategory = screen.getByRole('button', { name: '全部文章' })
+    expect(selectedCategory).toHaveClass('text-brand-blue', 'dark:text-blue-300')
+    expect(selectedCategory).not.toHaveClass('bg-blue-50', 'dark:bg-blue-500/10')
     expect(screen.getByRole('button', { name: '最新文章' })).toHaveClass('flex', 'min-h-[52px]', 'items-center')
 
     expect(document.querySelectorAll('.animate-pulse')).toHaveLength(0)

@@ -23,7 +23,7 @@ const AdminLayout: React.FC = () => {
               end
               className={({ isActive }) => `relative flex min-h-11 shrink-0 items-center rounded-xl px-3 text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue focus-visible:ring-offset-2 ${
                 isActive
-                  ? 'bg-blue-50 text-brand-blue dark:bg-blue-500/10 dark:text-blue-300'
+                  ? 'text-brand-blue dark:text-blue-300'
                   : 'text-slate-600 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white'
               }`}
             >
