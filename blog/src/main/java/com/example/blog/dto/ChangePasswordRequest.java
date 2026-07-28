@@ -2,7 +2,6 @@ package com.example.blog.dto;
 
 import com.example.blog.validation.ValidPassword;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 /**

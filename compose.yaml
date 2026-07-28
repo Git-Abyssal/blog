@@ -148,8 +148,8 @@ services:
       timeout: 5s
       retries: 3
 
-  # Public TLS edge. Let’s Encrypt issues a short-lived certificate directly
-  # for the server IP and Caddy renews it automatically.
+  # Public TLS edge. Let’s Encrypt issues a short-lived certificate for the
+  # configured domain or server IP, and Caddy renews it automatically.
   caddy:
     build: ./caddy
     container_name: blog-caddy
