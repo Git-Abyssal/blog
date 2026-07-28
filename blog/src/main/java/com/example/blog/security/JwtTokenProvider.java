@@ -35,10 +35,6 @@ public class JwtTokenProvider {
     /** 单点登录：JWT 中的 session 标识，与 Redis 中存储的当前有效 sid 一致才视为有效 */
     public static final String CLAIM_SID = "sid";
 
-    public String generateToken(UserDetails userDetails) {
-        return generateToken(userDetails, java.util.UUID.randomUUID().toString());
-    }
-
     /** 生成带 sessionId 的 token，用于单点登录（登录时需将 sid 写入 Redis） */
     public String generateToken(UserDetails userDetails, String sessionId) {
         Map<String, Object> claims = new HashMap<>();
