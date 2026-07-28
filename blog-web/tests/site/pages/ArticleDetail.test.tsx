@@ -106,7 +106,7 @@ describe('ArticleDetail comments', () => {
       'href',
       '/?tab=latest#articles',
     )
-    expect(returnLink).toHaveClass('relative', 'text-lg')
+    expect(returnLink).toHaveClass('relative', 'text-sm')
     expect(returnLink.querySelector('svg')).toHaveClass('absolute', 'right-full', 'h-5', 'w-5')
     expect(returnLink.parentElement).not.toHaveClass('border-t', 'border-slate-200')
     expect(returnLink.parentElement?.nextElementSibling).toHaveClass(
@@ -193,7 +193,7 @@ describe('ArticleDetail comments', () => {
       'xl:justify-center',
       'relative',
       'min-[1400px]:left-[5rem]',
-      'min-[1400px]:gap-10',
+      'min-[1400px]:gap-20',
     )
     expect(articleElement?.parentElement?.parentElement?.parentElement).toHaveClass('pt-4', 'lg:pt-6')
     expect(title.parentElement?.parentElement).not.toHaveClass('my-2')
@@ -203,7 +203,7 @@ describe('ArticleDetail comments', () => {
     const returnLinkSlot = screen.getByRole('link', { name: '返回文章列表' }).parentElement
     expect(returnLinkSlot).toHaveClass(
       'min-[1400px]:fixed',
-      'min-[1400px]:left-[calc(50%_-_39rem)]',
+      'min-[1400px]:left-[calc(50%_-_41.75rem)]',
       'min-[1400px]:right-auto',
       'min-[1400px]:top-7',
       'min-[1400px]:z-40',
@@ -373,6 +373,12 @@ describe('ArticleDetail comments', () => {
     expect(relatedSection?.closest('aside')).toHaveClass('space-y-2', 'top-0')
     expect(relatedSection?.closest('aside')).not.toHaveClass('lg:mt-11')
     expect(relatedSection?.closest('aside')).not.toHaveClass('top-4')
+    expect(relatedSection?.querySelector('div')).toHaveClass(
+      'border-l',
+      'border-slate-200',
+      'pl-2',
+      'dark:border-slate-700',
+    )
     const relatedLink = screen.getByRole('link', { name: /下一篇文章/ })
     expect(relatedLink).toHaveClass('py-1')
     expect(relatedLink.querySelector('p')).toHaveClass('leading-4')
