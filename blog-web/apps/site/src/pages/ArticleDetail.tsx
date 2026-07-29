@@ -589,28 +589,30 @@ const ArticleDetail: React.FC = () => {
           </div>
 
           {/* ========== Sidebar ========== */}
-          <aside className="sticky top-0 hidden max-h-[calc(100vh-2rem)] w-72 shrink-0 self-start space-y-2 overflow-y-auto pr-1 lg:block">
-            {/* Dynamic Table of Contents */}
-            <TableOfContents content={article.content ?? ''} />
+          <aside className="hidden w-72 shrink-0 lg:block lg:self-stretch">
+            <div className="sticky top-0 max-h-[calc(100vh-2rem)] space-y-2 overflow-y-auto pr-1">
+              {/* Dynamic Table of Contents */}
+              <TableOfContents content={article.content ?? ''} />
 
-            {/* Related articles */}
-            {relatedArticles.length > 0 && (
-              <section className="border-y border-slate-200 pt-2 dark:border-slate-700">
-                <h2 className="mb-1.5 text-sm font-bold text-slate-950 dark:text-white">继续阅读</h2>
-                <div className="border-l border-slate-200 pl-2 divide-y divide-slate-200 dark:border-slate-700 dark:divide-slate-700">
-                  {relatedArticles.map((related) => (
-                    <Link key={related.id} to={`/article/${related.id}`} state={articleLinkState} className="group block py-1 first:pt-0">
-                      <p className="line-clamp-2 text-sm font-medium leading-4 text-slate-700 transition-colors group-hover:text-brand-blue dark:text-slate-300">{related.title}</p>
-                      <div className="mt-0.5 flex items-center gap-2 text-xs text-slate-600 dark:text-slate-400">
-                        <span>{new Date(related.createdAt).toLocaleDateString()}</span>
-                        <span>·</span>
-                        <span>{related.views ?? 0} 阅读</span>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              </section>
-            )}
+              {/* Related articles */}
+              {relatedArticles.length > 0 && (
+                <section className="border-y border-slate-200 pt-2 dark:border-slate-700">
+                  <h2 className="mb-1.5 text-sm font-bold text-slate-950 dark:text-white">继续阅读</h2>
+                  <div className="border-l border-slate-200 pl-2 divide-y divide-slate-200 dark:border-slate-700 dark:divide-slate-700">
+                    {relatedArticles.map((related) => (
+                      <Link key={related.id} to={`/article/${related.id}`} state={articleLinkState} className="group block py-1 first:pt-0">
+                        <p className="line-clamp-2 text-sm font-medium leading-4 text-slate-700 transition-colors group-hover:text-brand-blue dark:text-slate-300">{related.title}</p>
+                        <div className="mt-0.5 flex items-center gap-2 text-xs text-slate-600 dark:text-slate-400">
+                          <span>{new Date(related.createdAt).toLocaleDateString()}</span>
+                          <span>·</span>
+                          <span>{related.views ?? 0} 阅读</span>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </section>
+              )}
+            </div>
           </aside>
         </div>
       </div>

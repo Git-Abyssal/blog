@@ -217,6 +217,16 @@ describe('ArticleDetail comments', () => {
     expect(mobileTocSlot).toHaveClass('mb-[9px]', 'lg:hidden')
     expect(articleElement?.querySelector('.article-prose')).toHaveClass('w-full', '!max-w-none')
 
+    const sidebar = contentColumn?.nextElementSibling
+    expect(sidebar).toHaveClass('hidden', 'w-72', 'shrink-0', 'lg:block', 'lg:self-stretch')
+    expect(sidebar).not.toHaveClass('sticky', 'overflow-y-auto')
+    expect(sidebar?.firstElementChild).toHaveClass(
+      'sticky',
+      'top-0',
+      'max-h-[calc(100vh-2rem)]',
+      'overflow-y-auto',
+    )
+
     const date = await screen.findByText(new Date(article.createdAt).toLocaleDateString())
     expect(date.parentElement).toHaveClass('mb-2.5', 'min-h-10', 'sm:min-h-11', 'border-b')
     expect(date.parentElement).not.toHaveClass('pb-4')
@@ -370,9 +380,8 @@ describe('ArticleDetail comments', () => {
     expect(relatedSection).toHaveClass('border-y', 'border-slate-200', 'pt-2', 'dark:border-slate-700')
     expect(relatedSection).not.toHaveClass('border-t')
     expect(relatedSection).not.toHaveClass('border-slate-300', 'border-slate-400', 'dark:border-slate-600')
-    expect(relatedSection?.closest('aside')).toHaveClass('space-y-2', 'top-0')
-    expect(relatedSection?.closest('aside')).not.toHaveClass('lg:mt-11')
-    expect(relatedSection?.closest('aside')).not.toHaveClass('top-4')
+    expect(relatedSection?.parentElement).toHaveClass('sticky', 'space-y-2', 'top-0')
+    expect(relatedSection?.parentElement).not.toHaveClass('lg:mt-11', 'top-4')
     expect(relatedSection?.querySelector('div')).toHaveClass(
       'border-l',
       'border-slate-200',
