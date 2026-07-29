@@ -590,7 +590,7 @@ const ArticleDetail: React.FC = () => {
 
           {/* ========== Sidebar ========== */}
           <aside className="hidden w-72 shrink-0 lg:block lg:self-stretch">
-            <div className="sticky top-0 max-h-[calc(100vh-2rem)] space-y-2 overflow-y-auto pr-1">
+            <div className="fixed top-0 max-h-[calc(100vh-2rem)] w-72 space-y-2 overflow-y-auto pr-1">
               {/* Dynamic Table of Contents */}
               <TableOfContents content={article.content ?? ''} />
 
