@@ -222,12 +222,12 @@ describe('ArticleDetail comments', () => {
     expect(sidebar).not.toHaveClass('sticky', 'overflow-y-auto')
     expect(sidebar?.firstElementChild).toHaveClass(
       'fixed',
-      'top-0',
-      'max-h-[calc(100vh-2rem)]',
+      'top-7',
+      'max-h-[calc(100vh-3.5rem)]',
       'w-72',
       'overflow-y-auto',
     )
-    expect(sidebar?.firstElementChild).not.toHaveClass('sticky')
+    expect(sidebar?.firstElementChild).not.toHaveClass('sticky', 'top-0')
 
     const date = await screen.findByText(new Date(article.createdAt).toLocaleDateString())
     expect(date.parentElement).toHaveClass('mb-2.5', 'min-h-10', 'sm:min-h-11', 'border-b')
@@ -382,8 +382,8 @@ describe('ArticleDetail comments', () => {
     expect(relatedSection).toHaveClass('border-y', 'border-slate-200', 'pt-2', 'dark:border-slate-700')
     expect(relatedSection).not.toHaveClass('border-t')
     expect(relatedSection).not.toHaveClass('border-slate-300', 'border-slate-400', 'dark:border-slate-600')
-    expect(relatedSection?.parentElement).toHaveClass('fixed', 'space-y-2', 'top-0')
-    expect(relatedSection?.parentElement).not.toHaveClass('sticky')
+    expect(relatedSection?.parentElement).toHaveClass('fixed', 'space-y-2', 'top-7')
+    expect(relatedSection?.parentElement).not.toHaveClass('sticky', 'top-0')
     expect(relatedSection?.parentElement).not.toHaveClass('lg:mt-11', 'top-4')
     expect(relatedSection?.querySelector('div')).toHaveClass(
       'border-l',
