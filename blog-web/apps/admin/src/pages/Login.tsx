@@ -4,6 +4,16 @@ import axios from 'axios';
 import { useAuth } from '@shared/hooks/useAuth';
 import { User as UserIcon, Lock, ArrowRight, Eye, EyeOff, AlertCircle, Info } from 'lucide-react';
 
+const safeInternalPath = (value: unknown, fallback: string) => (
+  typeof value === 'string'
+    && value.startsWith('/')
+    && !value.startsWith('//')
+    && !value.includes('\\')
+    && !/%5c/i.test(value)
+    ? value
+    : fallback
+);
+
 const Login: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -16,7 +26,7 @@ const Login: React.FC = () => {
   const { login, isAuthenticated, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const from = (location.state as { from?: string } | null)?.from ?? '/articles';
+  const from = safeInternalPath((location.state as { from?: unknown } | null)?.from, '/articles');
   const usernameInvalid = errorField === 'username' || errorField === 'credentials';
   const passwordInvalid = errorField === 'password' || errorField === 'credentials';
 

@@ -59,6 +59,27 @@ describe('Login Page', () => {
     expect(await screen.findByText('后台文章管理')).toBeInTheDocument()
   })
 
+  it('rejects an unsafe post-login redirect path', async () => {
+    vi.mocked(useAuth).mockReturnValue({
+      owner: { id: 1, username: 'owner' },
+      isAuthenticated: true,
+      login: mockLogin,
+      logout: vi.fn(),
+      loading: false,
+    })
+
+    render(
+      <MemoryRouter initialEntries={[{ pathname: '/login', state: { from: '/\\evil.example' } }]}>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/articles" element={<p>后台文章管理</p>} />
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    expect(await screen.findByText('后台文章管理')).toBeInTheDocument()
+  })
+
   it('shows validation error for empty fields', () => {
     render(
       <BrowserRouter>

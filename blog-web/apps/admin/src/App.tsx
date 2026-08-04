@@ -50,7 +50,7 @@ function App() {
       <AuthProvider>
         <ToastProvider>
           <DarkModeProvider>
-            <BrowserRouter basename="/admin" future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <BrowserRouter basename="/admin">
               <PasswordChangeGate>
                 <Routes>
                   <Route path="/login" element={<Login />} />

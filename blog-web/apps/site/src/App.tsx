@@ -47,7 +47,7 @@ function App() {
       <HelmetProvider>
         <ToastProvider>
           <DarkModeProvider>
-            <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <Router>
               <RouteFocusManager />
               <div className="page-bg-pattern flex min-h-screen flex-col bg-[var(--page-bg)] transition-colors">
                 <SEO />

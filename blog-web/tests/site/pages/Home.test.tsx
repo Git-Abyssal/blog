@@ -160,11 +160,12 @@ describe('Home Page', () => {
 
   it('keeps refresh feedback within the active tab instead of showing a full-width loading bar', async () => {
     let resolveHotRequest: ((value: { data: { content: never[]; totalPages: number; totalElements: number } }) => void) | undefined
-    vi.mocked(axios.get).mockImplementation((url: string, config?: { params?: { tab?: string } }) => {
+    vi.mocked(axios.get).mockImplementation((url, config) => {
+      const params = config?.params as { tab?: string } | undefined
       if (url.startsWith('/api/categories')) {
         return Promise.resolve({ data: [] })
       }
-      if (config?.params?.tab === 'hot') {
+      if (params?.tab === 'hot') {
         return new Promise((resolve) => {
           resolveHotRequest = resolve
         })
@@ -346,7 +347,8 @@ describe('Home Page', () => {
   })
 
   it('queries the selected page and keeps the page number in the URL', async () => {
-    vi.mocked(axios.get).mockImplementation((url: string, config?: { params?: { page?: number } }) => {
+    vi.mocked(axios.get).mockImplementation((url, config) => {
+      const params = config?.params as { page?: number } | undefined
       if (url.startsWith('/api/categories')) {
         return Promise.resolve({ data: [] })
       }
@@ -355,7 +357,7 @@ describe('Home Page', () => {
           content: mockArticles,
           totalPages: 3,
           totalElements: 17,
-          number: config?.params?.page ?? 0,
+          number: params?.page ?? 0,
           size: 10,
         },
       })
