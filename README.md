@@ -14,7 +14,7 @@
 ## 技术栈
 
 - 后端：Java 17、Spring Boot、Spring Security、MyBatis-Plus、Flyway
-- 前端：Node.js 20+、React、TypeScript、Vite、Tailwind CSS
+- 前端：Node.js 24+、React、TypeScript、Vite、Tailwind CSS
 - 基础设施：MySQL 8、Redis 7、Nginx、Caddy
 
 ## 项目结构
@@ -31,7 +31,7 @@ compose.yaml          生产部署编排
 
 ## 本地开发
 
-需要 Java 17、Node.js 20 或更高版本、MySQL 8 和 Redis 7。
+需要 Java 17、Node.js 24 或更高版本、MySQL 8 和 Redis 7。
 
 先创建数据库并启动后端：
 

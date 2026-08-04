@@ -16,7 +16,7 @@ tests/
 
 ## 本地开发
 
-需要 Node.js 20 或更高版本。
+需要 Node.js 24 或更高版本。
 
 ```bash
 npm ci
