@@ -52,11 +52,6 @@
 		reverse_proxy resume-frontend:8080
 	}
 
-	# 美甲本页面已迁到 helloabyssal.com；这里只保留 308 跳转，
-	# 兜住可能还内置旧网址的已发布 App 版本。
-	@nailbookLegacy path /privacy /privacy/ /support /support/ /nailbook/* /nailbook-assets/*
-	redir @nailbookLegacy https://helloabyssal.com{uri} 308
-
 	handle {
 		reverse_proxy frontend:8080
 	}
@@ -73,7 +68,7 @@ helloabyssal.com {
 	@home path /
 	redir @home /nailbook/support 308
 
-	@nailbookPages path /privacy /privacy/ /support /support/ /nailbook/* /nailbook-assets/*
+	@nailbookPages path /nailbook/* /nailbook-assets/*
 	handle @nailbookPages {
 		reverse_proxy nailbook-site:80
 	}
