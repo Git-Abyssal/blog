@@ -1,20 +1,84 @@
 {
 	admin off
-	default_sni {$SITE_ADDRESS}
+	default_sni 43.142.151.167
 }
 
 {$SITE_ADDRESS} {
-	tls {
-		issuer acme {
-			profile shortlived
-		}
-	}
-
 	header {
 		Strict-Transport-Security "max-age=31536000"
 		-Server
 	}
 
 	encode zstd gzip
-	reverse_proxy frontend:8080
+
+	@legacyIp host 43.142.151.167
+	redir @legacyIp https://abyssalnotes.com{uri} 308
+
+	handle /files/api/* {
+		uri strip_prefix /files
+		reverse_proxy fileshare-backend:8080 {
+			transport http {
+				dial_timeout 10s
+				response_header_timeout 30m
+				read_timeout 30m
+				write_timeout 30m
+			}
+		}
+	}
+
+	handle /files-objects/* {
+		uri strip_prefix /files-objects
+		reverse_proxy fileshare-minio:9000 {
+			header_up Host minio:9000
+			transport http {
+				dial_timeout 10s
+				response_header_timeout 30m
+				read_timeout 30m
+				write_timeout 30m
+			}
+			flush_interval -1
+		}
+	}
+
+	@files path /files /files/*
+	handle @files {
+		reverse_proxy fileshare-frontend:3000
+	}
+
+	@resumeRoot path /resume
+	redir @resumeRoot /resume/ 308
+
+	handle /resume/* {
+		reverse_proxy resume-frontend:8080
+	}
+
+	@nailbookPages path /privacy /privacy/ /support /support/ /nailbook/* /nailbook-assets/*
+	handle @nailbookPages {
+		reverse_proxy nailbook-site:80
+	}
+
+	handle {
+		reverse_proxy frontend:8080
+	}
+}
+
+helloabyssal.com {
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		-Server
+	}
+
+	encode zstd gzip
+
+	@home path /
+	redir @home /nailbook/support 308
+
+	@nailbookPages path /privacy /privacy/ /support /support/ /nailbook/* /nailbook-assets/*
+	handle @nailbookPages {
+		reverse_proxy nailbook-site:80
+	}
+
+	handle {
+		respond "Not Found" 404
+	}
 }
